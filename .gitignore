@@ -1,0 +1,29 @@
+# Ignorar directorios de construcción para todos los submódulos
+target/
+build/
+
+# Ignorar archivos del entorno de desarrollo
+.idea/          # Directorio de IntelliJ IDEA
+.vscode/        # Directorio de Visual Studio Code
+*.iml           # Archivos de módulos de IntelliJ
+.classpath
+.project
+.settings/
+
+# Ignorar archivos del sistema operativo
+.DS_Store       # Archivos de Mac OS
+Thumbs.db       # Archivos de Windows
+
+# Ignorar dependencias locales (si se usan)
+.m2/repository/
+
+# Ignorar variables de entorno
+.env
+.env.local
+
+# Ignorar logs
+*.log
+logs/
+
+# Ignorar archivos y directorios específicos de un IDE
+.metadata/
