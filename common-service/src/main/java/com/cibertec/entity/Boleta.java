@@ -22,10 +22,8 @@ import lombok.Data;
 @Entity
 @Table(name = "tb_boleta")
 public class Boleta {
-
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_boleta")
 	private Integer id;
 	
 	@Column(name = "direccion", nullable = false, length = 100)

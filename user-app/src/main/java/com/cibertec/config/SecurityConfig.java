@@ -20,7 +20,11 @@ public class SecurityConfig {
         	.cors(Customizer.withDefaults())
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-            		.requestMatchers("/api/usuarios/**").hasRole("ADMIN")
+            		.requestMatchers(
+            				"/api/usuarios/**",
+            				"/api/roles/**",
+            				"/api/trabajadores/**"
+            		).hasRole("ADMIN")
             		.requestMatchers("/api/account/**").permitAll()
             		.anyRequest().authenticated()
             )
