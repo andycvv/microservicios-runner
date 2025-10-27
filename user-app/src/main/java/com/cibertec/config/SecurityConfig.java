@@ -20,8 +20,8 @@ public class SecurityConfig {
         	.cors(Customizer.withDefaults())
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-            		.requestMatchers("/api/usuarios/**").hasAnyRole("ADMIN")
-            		.requestMatchers("/api/account/**").hasAnyRole("CLIENTE", "ADMIN")
+            		.requestMatchers("/api/usuarios/**").hasRole("ADMIN")
+            		.requestMatchers("/api/account/**").permitAll()
             		.anyRequest().authenticated()
             )
             .oauth2ResourceServer(oauth2 -> oauth2

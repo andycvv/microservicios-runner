@@ -12,6 +12,7 @@ public class UsuarioCreacionDTO {
 	private String clave;
 	private String telefono;
 	private Integer idRol;
+	private Integer idPais;
 	private Integer idDepartamento;
 	private Integer idProvincia;
 	private Integer idDistrito;
