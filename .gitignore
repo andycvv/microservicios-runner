@@ -9,6 +9,10 @@ build/
 .classpath
 .project
 .settings/
+.factorypath
+
+# Ignorar site descriptor de Maven/HTML reports en módulos
+**/src/site/site.xml
 
 # Ignorar archivos del sistema operativo
 .DS_Store       # Archivos de Mac OS
