@@ -14,6 +14,7 @@ public class UsuarioDTO {
 	private String email;
 	private String telefono;
 	private String rol;
+	private String pais;
 	private String departamento;
 	private String provincia;
 	private String distrito;
