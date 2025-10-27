@@ -1,4 +1,4 @@
-package com.cibertec.oauth_server.dto;
+package com.cibertec.dto;
 
 import lombok.Data;
 
