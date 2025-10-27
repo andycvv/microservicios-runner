@@ -17,12 +17,14 @@ import com.cibertec.dto.response.SuccessResponse;
 import com.cibertec.dto.response.UsuarioDTO;
 import com.cibertec.entity.Departamento;
 import com.cibertec.entity.Distrito;
+import com.cibertec.entity.Pais;
 import com.cibertec.entity.Provincia;
 import com.cibertec.entity.Rol;
 import com.cibertec.entity.Usuario;
 import com.cibertec.mapper.UsuarioMapper;
 import com.cibertec.repository.IDepartamentoRepository;
 import com.cibertec.repository.IDistritoRepository;
+import com.cibertec.repository.IPaisRepository;
 import com.cibertec.repository.IProvinciaRepository;
 import com.cibertec.repository.IRolRepository;
 import com.cibertec.repository.IUsuarioRepository;
@@ -37,6 +39,8 @@ public class UsuarioServiceImpl implements UsuarioService {
 	private IUsuarioRepository usuarioRepository;
 	@Autowired
 	private IRolRepository rolRepository;
+	@Autowired
+	private IPaisRepository paisRepository;
 	@Autowired
 	private IDepartamentoRepository departamentoRepository;
 	@Autowired
@@ -71,6 +75,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 		Rol rol = rolRepository.findById(dto.getIdRol())
 				.orElseThrow(() -> new NoResultException("No se encontro el rol con id: " + dto.getIdRol()));
 
+		Pais pais = paisRepository.findById(dto.getIdPais()).orElseThrow(
+				() -> new NoResultException("No se encontro el pais con id: " + dto.getIdPais()));
+		
 		Departamento departamento = departamentoRepository.findById(dto.getIdDepartamento()).orElseThrow(
 				() -> new NoResultException("No se encontro el departamento con id: " + dto.getIdDepartamento()));
 
@@ -83,7 +90,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 		String nuevaClave = generarClaveRandom(10);
 		dto.setClave(passwordEncoder.encode(nuevaClave));
 		
-		Usuario usuario = usuarioMapper.toUsuario(null, dto, rol, departamento, provincia, distrito);
+		Usuario usuario = usuarioMapper.toUsuario(null, dto, rol, pais, departamento, provincia, distrito);
 		
 		UsuarioDTO usuarioDTO = usuarioMapper.toUsuarioDTO(usuarioRepository.save(usuario));
 		

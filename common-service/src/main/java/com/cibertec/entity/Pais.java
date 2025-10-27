@@ -1,5 +1,11 @@
 package com.cibertec.entity;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,4 +24,18 @@ public class Pais {
 	private String img;
 	private String abreviatura;
 	private String simbolo;
+	
+    @Column(nullable = false, updatable = false)
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @Column(updatable = true)
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
+
+    @Column(nullable = false)
+    private boolean isDelete = false;
+
+    @Column(nullable = false)
+    private boolean isEnabled = true;
 }
