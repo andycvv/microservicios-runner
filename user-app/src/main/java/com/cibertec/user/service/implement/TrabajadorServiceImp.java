@@ -10,9 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.cibertec.entity.Trabajador;
+import com.cibertec.entity.Usuario;
 import com.cibertec.user.dto.request.TrabajadorDTO;
-import com.cibertec.user.model.Trabajador;
-import com.cibertec.user.model.Usuario;
 import com.cibertec.user.repository.ITrabajadorRepository;
 import com.cibertec.user.repository.IUsuarioRepository;
 import com.cibertec.user.service.TrabajadorService;
@@ -35,7 +35,8 @@ public class TrabajadorServiceImp implements TrabajadorService {
             
             Trabajador t = new Trabajador();
             t.setId(usu.getId());
-            t.setEstado("A");
+            t.setEnabled(true);
+            t.setDelete(false);
             t.setHorasLaborales(trabajador.getHorasLaborales());
             t.setSalario(trabajador.getSalario());
             
@@ -62,7 +63,8 @@ public class TrabajadorServiceImp implements TrabajadorService {
             Optional<Trabajador> op = trabajadorRepo.findById(id);
             if (op.isPresent()) {
                 Trabajador t = op.get();
-                t.setEstado("I");
+                t.setEnabled(false);
+                t.setDelete(true);
                 trabajadorRepo.save(t);
                 respuesta.put("mensaje", "Trabajador eliminado lógicamente");
                 respuesta.put("fecha", new Date());
@@ -105,7 +107,7 @@ public class TrabajadorServiceImp implements TrabajadorService {
         Map<String, Object> respuesta = new HashMap<>();
         try {
             List<Trabajador> lista = trabajadorRepo.findAll().stream()
-                    .filter(t -> "A".equals(t.getEstado()))
+                    .filter(t -> t.isEnabled() && !t.isDelete())
                     .toList();
             respuesta.put("mensaje", "Listado de trabajadores activos");
             respuesta.put("fecha", new Date());
@@ -125,7 +127,7 @@ public class TrabajadorServiceImp implements TrabajadorService {
         Map<String, Object> respuesta = new HashMap<>();
         try {
             List<Trabajador> lista = trabajadorRepo.findAll().stream()
-                    .filter(t -> "I".equals(t.getEstado()))
+                    .filter(t -> !t.isEnabled())
                     .toList();
             respuesta.put("mensaje", "Listado de trabajadores inactivos");
             respuesta.put("fecha", new Date());

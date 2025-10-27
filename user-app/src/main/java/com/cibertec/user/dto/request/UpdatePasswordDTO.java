@@ -3,6 +3,6 @@ import lombok.Data;
 
 @Data
 public class UpdatePasswordDTO {
-    private String contraseniaActual;
-    private String nuevaContrasenia;
+    private String claveActual;
+    private String nuevaClave;
 }

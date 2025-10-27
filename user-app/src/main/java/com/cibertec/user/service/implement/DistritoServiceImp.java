@@ -9,8 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.cibertec.entity.Distrito;
 import com.cibertec.user.dto.response.SuccessResponse;
-import com.cibertec.user.model.Distrito;
 import com.cibertec.user.repository.IDistritoRepository;
 import com.cibertec.user.service.DistritoService;
 

@@ -1,7 +1,6 @@
 package com.cibertec.user.dto.request;
 
-
-import com.cibertec.user.model.Usuario;
+import com.cibertec.entity.Usuario;
 
 import lombok.Data;
 

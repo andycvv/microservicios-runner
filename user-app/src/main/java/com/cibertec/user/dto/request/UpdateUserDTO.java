@@ -6,6 +6,6 @@ import lombok.Data;
 public class UpdateUserDTO {
 	private String nombre;
 	private String apellido;
-	private String nmrDocumento;
+	private String dni;
 	private String telefono;
 }

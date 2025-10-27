@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.cibertec.user.model.Usuario;
+import com.cibertec.entity.Usuario;
 import com.cibertec.user.repository.IUsuarioRepository;
 
 @Service
@@ -19,13 +19,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String mail) throws UsernameNotFoundException {
     	
-        Usuario usuario = userRepository.findByCorreo(mail)
+        Usuario usuario = userRepository.findByEmail(mail)
             .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
         return User.builder()
-            .username(usuario.getCorreo())
-            .password(usuario.getContrasenia())
-            .roles(usuario.getRol()) 
+            .username(usuario.getEmail())
+            .password(usuario.getClave())
+            .roles(usuario.getRol().getNombre()) 
             .build();
     }
 }

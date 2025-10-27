@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cibertec.user.dto.request.RegisterUserDTO;
 import com.cibertec.user.dto.request.UpdatePasswordDTO;
 import com.cibertec.user.dto.request.UpdateUserDTO;
+import com.cibertec.user.dto.request.UsuarioCreacionDTO;
 import com.cibertec.user.dto.response.SuccessResponse;
 import com.cibertec.user.dto.response.UserResponse;
 import com.cibertec.user.service.implement.AccountServiceImp;
@@ -24,12 +24,12 @@ import com.cibertec.user.service.implement.AccountServiceImp;
 public class AccountController {
 
 	@Autowired
-	private AccountServiceImp userService;
+	private AccountServiceImp accountService;
 	
 	@PostMapping("/register")
-	public ResponseEntity<SuccessResponse<String>> registerUser(@RequestBody RegisterUserDTO request) {
+	public ResponseEntity<SuccessResponse<String>> registerUser(@RequestBody UsuarioCreacionDTO request) {
 		
-		userService.registerUser(request);
+		accountService.registerUser(request);
 		
 		SuccessResponse<String> success = SuccessResponse.<String>builder()
 			        .timestamp(LocalDateTime.now())
@@ -41,9 +41,9 @@ public class AccountController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(success);
 	}
 
-	@PutMapping("/update-user") // actualizar datos de usuario 
+	@PutMapping("/update-user")
 	public ResponseEntity<SuccessResponse<String>> updateUser(@RequestBody UpdateUserDTO request) {
-		userService.updateUser(request);
+		accountService.updateUser(request);
 		
 		 SuccessResponse<String> success = SuccessResponse.<String>builder()
 			        .timestamp(LocalDateTime.now())
@@ -55,9 +55,9 @@ public class AccountController {
 		return ResponseEntity.ok(success);
 	}
 
-	@PutMapping("/update-password") // actualizar contraseña
+	@PutMapping("/actualizar-clave")
 	public ResponseEntity<SuccessResponse<String>> updatePassword(@RequestBody UpdatePasswordDTO request) {
-		userService.updatePassword(request);
+		accountService.updatePassword(request);
 		
 		SuccessResponse<String> success = SuccessResponse.<String>builder()
 			        .timestamp(LocalDateTime.now())
@@ -69,9 +69,9 @@ public class AccountController {
 		return ResponseEntity.ok(success);
 	}
 
-	@GetMapping("/user-data") // datos del usuario
+	@GetMapping("/user-data")
 	public ResponseEntity<SuccessResponse<UserResponse>> getUsuarioLogueado() {
-		UserResponse response = userService.getUsuarioLogueado();
+		UserResponse response = accountService.getUsuarioLogueado();
 		
 		SuccessResponse<UserResponse> success = SuccessResponse.<UserResponse>builder()
 			        .timestamp(LocalDateTime.now())
@@ -82,18 +82,4 @@ public class AccountController {
 		
 		return ResponseEntity.ok(success);
 	}
-
-//	@PostMapping("/sign-in")
-//	public ResponseEntity<SuccessResponse<String>> signin(@RequestBody LoginDTO request) {
-//		String mensaje = userService.signin(request);
-//		
-//		SuccessResponse<String> success = SuccessResponse.<String>builder()
-//			        .timestamp(LocalDateTime.now())
-//			        .status(HttpStatus.OK.value())
-//			        .success(HttpStatus.OK.getReasonPhrase())
-//			        .response(mensaje)
-//			        .build();
-//		 
-//		return ResponseEntity.ok(success);
-//	}
 }

@@ -6,10 +6,10 @@ import lombok.Data;
 public class RegisterUserDTO {
 	private String nombre;
 	private String apellido;
-	private String nmrDocumento;
+	private String dni;
+	private String email;
 	private String telefono;
-	private String correo;
-	private String contrasenia;
+	private String clave;
 	private int idDto;
 }
 

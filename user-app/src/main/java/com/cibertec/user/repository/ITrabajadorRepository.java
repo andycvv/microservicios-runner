@@ -3,8 +3,7 @@ package com.cibertec.user.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.cibertec.user.model.Trabajador;
-
+import com.cibertec.entity.Trabajador;
 
 @Repository
 public interface ITrabajadorRepository extends JpaRepository<Trabajador, Integer>{

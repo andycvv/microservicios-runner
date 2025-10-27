@@ -5,8 +5,8 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.cibertec.entity.Distrito;
 import com.cibertec.user.dto.response.SuccessResponse;
-import com.cibertec.user.model.Distrito;
 
 @Service
 public interface DistritoService {

@@ -1,6 +1,6 @@
 package com.cibertec.user.dto.response;
 
-import com.cibertec.user.model.Distrito;
+import com.cibertec.entity.Distrito;
 
 import lombok.Data;
 
