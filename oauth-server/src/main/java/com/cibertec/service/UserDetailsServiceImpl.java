@@ -1,4 +1,4 @@
-package com.cibertec.oauth_server.service;
+package com.cibertec.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.cibertec.entity.Usuario;
-import com.cibertec.oauth_server.repository.IUsuarioRepository;
+import com.cibertec.repository.IUsuarioRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

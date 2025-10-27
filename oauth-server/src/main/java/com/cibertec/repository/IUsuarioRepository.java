@@ -1,4 +1,4 @@
-package com.cibertec.oauth_server.repository;
+package com.cibertec.repository;
 
 import java.util.Optional;
 

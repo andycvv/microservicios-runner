@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cibertec.dto.request.ActualizarClaveDTO;
 import com.cibertec.dto.request.UsuarioActualizarDTO;
 import com.cibertec.dto.request.UsuarioCreacionDTO;
 import com.cibertec.dto.response.SuccessResponse;
