@@ -11,30 +11,45 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.cibertec.dto.request.TrabajadorDTO;
+import com.cibertec.dto.request.UsuarioCreacionDTO;
+import com.cibertec.dto.response.SuccessResponse;
+import com.cibertec.dto.response.UsuarioDTO;
+import com.cibertec.entity.Tienda;
 import com.cibertec.entity.Trabajador;
 import com.cibertec.entity.Usuario;
+import com.cibertec.repository.ITiendaRepository;
 import com.cibertec.repository.ITrabajadorRepository;
 import com.cibertec.repository.IUsuarioRepository;
 import com.cibertec.service.TrabajadorService;
+import com.cibertec.service.UsuarioService;
+
+import jakarta.persistence.NoResultException;
 
 @Service
 public class TrabajadorServiceImp implements TrabajadorService {
 
     @Autowired
     private ITrabajadorRepository trabajadorRepo;
-
+    
     @Autowired
-    private IUsuarioRepository usuarioRepo;
+    private ITiendaRepository tiendaRepo;
+    
+    @Autowired
+    private UsuarioService usuarioService;
 
     /// Registrar
     @Override
     public Map<String, Object> registrar(TrabajadorDTO trabajador) {
         Map<String, Object> respuesta = new HashMap<>();
         try {
-            Usuario usu = usuarioRepo.save(trabajador.getUsuario());
+        	Tienda tienda = tiendaRepo.findById(trabajador.getIdTienda())
+        			.orElseThrow(() -> new NoResultException("No se encontro la tienda con id: " + trabajador.getIdTienda()));
+        	
+            SuccessResponse<UsuarioDTO> res = usuarioService.crearUsuario(trabajador.getUsuario());
             
             Trabajador t = new Trabajador();
-            t.setId(usu.getId());
+            t.setId(res.getResponse().getId());
+            t.setTienda(tienda);
             t.setEnabled(true);
             t.setDelete(false);
             t.setHorasLaborales(trabajador.getHorasLaborales());

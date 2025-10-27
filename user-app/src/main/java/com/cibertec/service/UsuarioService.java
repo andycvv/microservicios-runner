@@ -10,6 +10,7 @@ import com.cibertec.dto.response.UsuarioDTO;
 
 public interface UsuarioService {
 	SuccessResponse<List<UsuarioDTO>> listarUsuarios();
+	SuccessResponse<List<UsuarioDTO>> listarUsuariosActivos();
 	SuccessResponse<UsuarioDTO> crearUsuario(UsuarioCreacionDTO usuario);
 	SuccessResponse<UsuarioDTO> obtenerUsuarioPorId(Integer id);
 	SuccessResponse<UsuarioDTO> actualizarCorreo(Integer id, UsuarioActualizarDTO usuario);

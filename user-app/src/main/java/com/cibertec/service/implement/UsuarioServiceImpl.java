@@ -57,7 +57,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	@Override
 	public SuccessResponse<List<UsuarioDTO>> listarUsuarios() {
-		List<UsuarioDTO> list = usuarioRepository.findAll().stream().map(usuarioMapper::toUsuarioDTO).toList();
+		List<UsuarioDTO> list = usuarioRepository.findAll().stream()
+				.map(usuarioMapper::toUsuarioDTO)
+				.toList();
 
 		if (list.isEmpty()) {
 			throw new NoResultException("No se encontro ningun usuario");
@@ -65,6 +67,22 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 		return SuccessResponse.ok(list);
 	}
+	
+	@Override
+	public SuccessResponse<List<UsuarioDTO>> listarUsuariosActivos() {
+		List<UsuarioDTO> list = usuarioRepository.findAll().stream()
+				.filter(u -> !u.isDelete() && u.isEnabled())
+				.map(usuarioMapper::toUsuarioDTO)
+				.toList();
+
+		if (list.isEmpty()) {
+			throw new NoResultException("No se encontro ningun usuario");
+		}
+
+		return SuccessResponse.ok(list);
+	}
+
+
 
 	@Override
 	public SuccessResponse<UsuarioDTO> crearUsuario(UsuarioCreacionDTO dto) {
