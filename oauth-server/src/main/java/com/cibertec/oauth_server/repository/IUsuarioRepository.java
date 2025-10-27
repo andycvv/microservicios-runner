@@ -4,8 +4,8 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.cibertec.oauth_server.model.Usuario;
+import com.cibertec.entity.Usuario;
 
 public interface IUsuarioRepository extends JpaRepository<Usuario, Integer> {
-    Optional<Usuario> findByCorreo(String correo);
+    Optional<Usuario> findByEmail(String correo);
 }

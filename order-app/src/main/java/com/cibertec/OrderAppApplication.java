@@ -1,13 +1,13 @@
-package com.cibertec.api_gateway;
+package com.cibertec;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ApiGatewayApplication {
+public class OrderAppApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ApiGatewayApplication.class, args);
+		SpringApplication.run(OrderAppApplication.class, args);
 	}
 
 }

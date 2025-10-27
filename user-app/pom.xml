@@ -32,6 +32,11 @@
 	</properties>
 	
 	<dependencies>
+		<dependency>
+			<groupId>com.cibertec</groupId>
+			<artifactId>common-service</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 		<!-- Dependencias de spring boot -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -96,6 +101,11 @@
 			<artifactId>logback-classic</artifactId>
 		</dependency>
 		<!-- Dependencias para OAuth2 y JWT -->
+		<!-- Mail starter (required for JavaMailSender / MimeMessage) -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
 	</dependencies>
 
 
