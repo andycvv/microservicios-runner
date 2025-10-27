@@ -9,14 +9,14 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "categoria")
+@Table(name = "tb_categoria")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Categoria {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     private String nombre;
     

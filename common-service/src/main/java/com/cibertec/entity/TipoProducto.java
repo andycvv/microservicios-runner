@@ -9,14 +9,14 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "tipo_producto")
+@Table(name = "tb_tipo_producto")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class TipoProducto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     private String nombre;
     
