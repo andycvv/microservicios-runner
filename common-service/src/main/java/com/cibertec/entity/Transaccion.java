@@ -7,6 +7,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
+import java.math.BigDecimal;
 
 @Data
 @Entity
@@ -20,13 +21,13 @@ public class Transaccion {
 	private int unidades;
 	
 	@Column(name = "descuento", nullable = false, precision = 10, scale = 2)
-    private Double descuento;
+    private BigDecimal descuento;
 
 	@Column(name = "precio_unitario", nullable = false, precision = 10, scale = 2)
-    private Double precioUnitario;
+    private BigDecimal precioUnitario;
 	
 	@Column(name = "total", nullable = false, precision = 10, scale = 2)
-    private Double total;
+    private BigDecimal total;
 
 	@ManyToOne
 	@JoinColumn(name = "id_boleta", referencedColumnName = "id_boleta", insertable = false, updatable = false)

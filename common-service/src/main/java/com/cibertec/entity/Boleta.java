@@ -1,5 +1,6 @@
 package com.cibertec.entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class Boleta {
 	private String tipoTarjeta;
 	
 	@Column(name = "total_descuento", nullable = false)
-	private double totalDescuento;
+	private BigDecimal totalDescuento;
 	
 	@Column(name = "nombre_cliente", nullable = false, length = 100)
 	private String nombreCliente;
@@ -43,13 +44,13 @@ public class Boleta {
 	private String numeroDocumento;
 	
 	@Column(name = "subtotal", nullable = false)
-	private double subtotal;
+	private BigDecimal subtotal;
 	
 	@Column(name = "igv", nullable = false)
-	private double igv = 0.18;
+	private BigDecimal igv = new BigDecimal("0.18");
 	
 	@Column(name = "total", nullable = false)
-	private double total;
+	private BigDecimal total;
 	
 	@Column(name = "estado", nullable = false, length = 100)
 	private String estado;
@@ -57,7 +58,8 @@ public class Boleta {
 	@Column(name = "observaciones", nullable = false, length = 100)
 	private String observaciones;
 	
-	@Column(name = "id_usuario", nullable = false)
+	@ManyToOne
+	@JoinColumn(name = "id_usuario", nullable = false)
 	private Usuario usuario;
 	
 	@ManyToOne
