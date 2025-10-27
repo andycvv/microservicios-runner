@@ -31,6 +31,12 @@ public class UsuarioController {
 		return ResponseEntity.status(resp.getStatus()).body(resp);
 	}
 	
+	@GetMapping("/activos")
+	public ResponseEntity<SuccessResponse<List<UsuarioDTO>>> listarUsuariosActivos() {
+		SuccessResponse<List<UsuarioDTO>> resp = usuarioService.listarUsuariosActivos();
+		return ResponseEntity.status(resp.getStatus()).body(resp);
+	}
+	
 	@GetMapping("/{id}")
 	public ResponseEntity<SuccessResponse<UsuarioDTO>> obtenerUsuarioPorId(
 			@PathVariable Integer id

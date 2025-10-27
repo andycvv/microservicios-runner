@@ -11,5 +11,7 @@ public class TrabajadorDTO {
 	
 	private int horasLaborales;
   
-    private Usuario usuario;
+    private UsuarioCreacionDTO usuario;
+    
+    private Integer idTienda;
 }

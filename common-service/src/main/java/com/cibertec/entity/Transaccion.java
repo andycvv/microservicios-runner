@@ -30,10 +30,10 @@ public class Transaccion {
     private BigDecimal total;
 
 	@ManyToOne
-	@JoinColumn(name = "id_boleta", referencedColumnName = "id_boleta", insertable = false, updatable = false)
+	@JoinColumn(name = "id_boleta", insertable = false, updatable = false)
 	private Boleta boleta;
 	
-//	@ManyToOne
-//	@JoinColumn(name = "id_producto", referencedColumnName = "id_producto", insertable = false, updatable = false)
-//	private Producto producto;
+	@ManyToOne
+	@JoinColumn(name = "id_producto", insertable = false, updatable = false)
+	private Producto producto;
 }
