@@ -74,14 +74,4 @@ public class Boleta {
 	@Column(name = "created_at", updatable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
-	
-	@Column(name = "updated_at")
-	@UpdateTimestamp
-    private LocalDateTime updatedAt;
-	
-	@Column(name = "is_deleted", nullable = false)
-	private Boolean isDeleted;
-	
-	@Column(name = "is_enabled", nullable = false)
-	private Boolean isEnabled;
 }

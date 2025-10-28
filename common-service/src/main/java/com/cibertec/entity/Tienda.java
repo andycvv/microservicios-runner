@@ -35,6 +35,9 @@ public class Tienda {
 	@Column(name = "ruc", nullable = false, length = 100)
 	private String ruc;
 	
+	@Column(name = "ruta_imagen", nullable = false, length = 200)
+	private String rutaImagen;
+	
 	@Column(name = "ubicacion", nullable = false, length = 100)
 	private String ubicacion;
 	
