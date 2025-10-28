@@ -14,7 +14,12 @@ import org.springframework.mail.javamail.JavaMailSender;
 import com.cibertec.dto.request.UsuarioActualizarDTO;
 import com.cibertec.dto.request.UsuarioCreacionDTO;
 import com.cibertec.dto.response.SuccessResponse;
+import com.cibertec.dto.response.UsuarioCreatedEvent;
 import com.cibertec.dto.response.UsuarioDTO;
+import com.cibertec.dto.response.PaisDTO;
+import com.cibertec.dto.response.DepartamentoDTO;
+import com.cibertec.dto.response.ProvinciaDTO;
+import com.cibertec.dto.response.DistritoDTO;
 import com.cibertec.entity.Departamento;
 import com.cibertec.entity.Distrito;
 import com.cibertec.entity.Pais;
@@ -22,14 +27,13 @@ import com.cibertec.entity.Provincia;
 import com.cibertec.entity.Rol;
 import com.cibertec.entity.Usuario;
 import com.cibertec.mapper.UsuarioMapper;
-import com.cibertec.repository.IDepartamentoRepository;
-import com.cibertec.repository.IDistritoRepository;
-import com.cibertec.repository.IPaisRepository;
-import com.cibertec.repository.IProvinciaRepository;
+import com.cibertec.client.UbicacionClient;
 import com.cibertec.repository.IRolRepository;
 import com.cibertec.repository.IUsuarioRepository;
 import com.cibertec.service.UsuarioService;
 import com.cibertec.util.ValidateText;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import jakarta.persistence.NoResultException;
 
@@ -40,20 +44,14 @@ public class UsuarioServiceImpl implements UsuarioService {
 	@Autowired
 	private IRolRepository rolRepository;
 	@Autowired
-	private IPaisRepository paisRepository;
-	@Autowired
-	private IDepartamentoRepository departamentoRepository;
-	@Autowired
-	private IProvinciaRepository provinciaRepository;
-	@Autowired
-	private IDistritoRepository distritoRepository;
+	private UbicacionClient ubicacionClient;
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	@Autowired
 	private UsuarioMapper usuarioMapper;
 	@Autowired
-	private JavaMailSender mailSender;
+	private MessageProducerService messageProducerService;
 
 	@Override
 	public SuccessResponse<List<UsuarioDTO>> listarUsuarios() {
@@ -82,8 +80,6 @@ public class UsuarioServiceImpl implements UsuarioService {
 		return SuccessResponse.ok(list);
 	}
 
-
-
 	@Override
 	public SuccessResponse<UsuarioDTO> crearUsuario(UsuarioCreacionDTO dto) {
 		if (usuarioRepository.findByEmail(dto.getEmail()).isPresent()) {
@@ -93,17 +89,25 @@ public class UsuarioServiceImpl implements UsuarioService {
 		Rol rol = rolRepository.findById(dto.getIdRol())
 				.orElseThrow(() -> new NoResultException("No se encontro el rol con id: " + dto.getIdRol()));
 
-		Pais pais = paisRepository.findById(dto.getIdPais()).orElseThrow(
-				() -> new NoResultException("No se encontro el pais con id: " + dto.getIdPais()));
-		
-		Departamento departamento = departamentoRepository.findById(dto.getIdDepartamento()).orElseThrow(
-				() -> new NoResultException("No se encontro el departamento con id: " + dto.getIdDepartamento()));
+		// fetch ubicacion DTOs via Feign client
+		SuccessResponse<PaisDTO> paisResp = ubicacionClient.getPais(dto.getIdPais());
+		PaisDTO paisDto = paisResp != null ? paisResp.getResponse() : null;
+		if (paisDto == null) throw new NoResultException("No se encontro el pais con id: " + dto.getIdPais());
+		SuccessResponse<DepartamentoDTO> depResp = ubicacionClient.getDepartamento(dto.getIdDepartamento());
+		DepartamentoDTO depDto = depResp != null ? depResp.getResponse() : null;
+		if (depDto == null) throw new NoResultException("No se encontro el departamento con id: " + dto.getIdDepartamento());
+		SuccessResponse<ProvinciaDTO> provResp = ubicacionClient.getProvincia(dto.getIdProvincia());
+		ProvinciaDTO provDto = provResp != null ? provResp.getResponse() : null;
+		if (provDto == null) throw new NoResultException("No se encontro la provincia con id: " + dto.getIdProvincia());
+		SuccessResponse<DistritoDTO> distResp = ubicacionClient.getDistrito(dto.getIdDistrito());
+		DistritoDTO distDto = distResp != null ? distResp.getResponse() : null;
+		if (distDto == null) throw new NoResultException("No se encontro el distrito con id: " + dto.getIdDistrito());
 
-		Provincia provincia = provinciaRepository.findById(dto.getIdProvincia()).orElseThrow(
-				() -> new NoResultException("No se encontro la provincia con id: " + dto.getIdProvincia()));
-		
-		Distrito distrito = distritoRepository.findById(dto.getIdDistrito()).orElseThrow(
-				() -> new NoResultException("No se encontro el distrito con id: " + dto.getIdDistrito()));
+		// map DTOs to minimal entity instances
+		Pais pais = new Pais(); pais.setId(paisDto.getId()); pais.setNombre(paisDto.getNombre());
+		Departamento departamento = new Departamento(); departamento.setId(depDto.getId()); departamento.setNombre(depDto.getNombre());
+		Provincia provincia = new Provincia(); provincia.setId(provDto.getId()); provincia.setNombre(provDto.getNombre());
+		Distrito distrito = new Distrito(); distrito.setId(distDto.getId()); distrito.setNombre(distDto.getNombre());
 
 		String nuevaClave = generarClaveRandom(10);
 		dto.setClave(passwordEncoder.encode(nuevaClave));
@@ -112,18 +116,20 @@ public class UsuarioServiceImpl implements UsuarioService {
 		
 		UsuarioDTO usuarioDTO = usuarioMapper.toUsuarioDTO(usuarioRepository.save(usuario));
 		
-		try {
-			SimpleMailMessage msg = new SimpleMailMessage();
-			msg.setTo(usuarioDTO.getEmail());
-			msg.setSubject("Nueva contraseña");
-			msg.setText("Su nueva contraseña es: " + nuevaClave + "\nPor favor cámbiela al iniciar sesión.");
-			msg.setFrom("pacmanbbva@gmail.com");
-			mailSender.send(msg);
-		} catch (Exception ex) {
-			System.err.println("Error enviando email: " + ex.getMessage());
-		}
+		UsuarioCreatedEvent usuarioEvent = UsuarioCreatedEvent.builder()
+				.nombre(usuarioDTO.getNombre())
+				.apellido(usuarioDTO.getApellido())
+				.tipoDocumento(usuarioDTO.getTipoDocumento())
+				.nmrDocumento(usuarioDTO.getNmrDocumento())
+				.email(usuarioDTO.getEmail())
+				.telefono(usuarioDTO.getTelefono())
+				.rol(usuarioDTO.getRol())
+				.clave(nuevaClave)
+				.build();
+		
+		messageProducerService.sendUsuarioCreado(usuarioEvent);
 
-		return SuccessResponse.created(usuarioDTO);
+	    return SuccessResponse.created(usuarioDTO);
 	}
 
 	@Override
@@ -161,24 +167,26 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	@Override
 	public SuccessResponse<String> actualizarClave(Integer id) {
-		Usuario user = usuarioRepository.findById(id)
-				.orElseThrow(() -> new NoResultException("No se encontro el usuario con id: " + id));
+		Usuario usuario = usuarioRepository.findById(id)
+			.orElseThrow(() -> new NoResultException("No se encontro el usuario con id: " + id));
 
 		String nuevaClave = generarClaveRandom(10);
 
-		user.setClave(passwordEncoder.encode(nuevaClave));
-		usuarioRepository.save(user);
+		usuario.setClave(passwordEncoder.encode(nuevaClave));
+		UsuarioDTO usuarioDTO = usuarioMapper.toUsuarioDTO(usuarioRepository.save(usuario));
+		
+		UsuarioCreatedEvent usuarioEvent = UsuarioCreatedEvent.builder()
+				.nombre(usuarioDTO.getNombre())
+				.apellido(usuarioDTO.getApellido())
+				.tipoDocumento(usuarioDTO.getTipoDocumento())
+				.nmrDocumento(usuarioDTO.getNmrDocumento())
+				.email(usuarioDTO.getEmail())
+				.telefono(usuarioDTO.getTelefono())
+				.rol(usuarioDTO.getRol())
+				.clave(nuevaClave)
+				.build();
 
-		try {
-			SimpleMailMessage msg = new SimpleMailMessage();
-			msg.setTo(user.getEmail());
-			msg.setSubject("Nueva contraseña");
-			msg.setText("Su nueva contraseña es: " + nuevaClave + "\nPor favor cámbiela al iniciar sesión.");
-			msg.setFrom("pacmanbbva@gmail.com");
-			mailSender.send(msg);
-		} catch (Exception ex) {
-			System.err.println("Error enviando email: " + ex.getMessage());
-		}
+		messageProducerService.sendPasswordReset(usuarioEvent);
 
 		return SuccessResponse.ok("Se actualizó la contraseña y se envió al correo del usuario.");
 	}
