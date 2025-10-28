@@ -10,6 +10,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -22,6 +24,10 @@ public class Distrito {
 	private Integer id;
 	private String nombre;
     
+	@ManyToOne
+	@JoinColumn(name = "id_provincia", nullable = false)
+	private Provincia provincia;
+	
     @Column(nullable = false, updatable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
