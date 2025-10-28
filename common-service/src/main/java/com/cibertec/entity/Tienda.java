@@ -72,8 +72,8 @@ public class Tienda {
     private LocalDateTime updatedAt;
 	
 	@Column(name = "is_deleted", nullable = false)
-	private Boolean isDeleted;
+	private Boolean isDeleted = false;
 	
 	@Column(name = "is_enabled", nullable = false)
-	private Boolean isEnabled;
+	private Boolean isEnabled = true;
 }
