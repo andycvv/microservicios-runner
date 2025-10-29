@@ -8,4 +8,5 @@ import com.cibertec.dto.response.TiendaDTO;
 public interface TiendaService {
 
 	public SuccessResponse<List<TiendaDTO>> listarTiendas();
+	public SuccessResponse<TiendaDTO> obtenerTiendaPorId(Integer id);
 }
