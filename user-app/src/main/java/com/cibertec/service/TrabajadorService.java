@@ -2,13 +2,13 @@ package com.cibertec.service;
 
 import java.util.Map;
 
-import com.cibertec.dto.request.TrabajadorDTO;
+import com.cibertec.dto.request.TrabajadorCreacionDTO;
 
 
 public interface TrabajadorService {
 
     /// Registrar
-    Map<String, Object> registrar(TrabajadorDTO trabajador);
+    Map<String, Object> registrar(TrabajadorCreacionDTO trabajador);
 
 
     /// Eliminador Lógico

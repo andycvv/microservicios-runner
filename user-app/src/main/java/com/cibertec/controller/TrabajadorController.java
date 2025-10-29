@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cibertec.dto.request.TrabajadorDTO;
+import com.cibertec.dto.request.TrabajadorCreacionDTO;
 import com.cibertec.service.TrabajadorService;
 
 @RestController
-@RequestMapping("/api/trabajador")
+@RequestMapping("/api/trabajadores")
 public class TrabajadorController {
 
     @Autowired
@@ -45,7 +45,7 @@ public class TrabajadorController {
 
     // Registrar
     @PostMapping
-    public Map<String, Object> registrar(@RequestBody TrabajadorDTO trabajador) {
+    public Map<String, Object> registrar(@RequestBody TrabajadorCreacionDTO trabajador) {
         return trabajadorService.registrar(trabajador);
     }
 

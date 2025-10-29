@@ -9,58 +9,56 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.cibertec.dto.request.TrabajadorDTO;
-import com.cibertec.dto.request.UsuarioCreacionDTO;
+import com.cibertec.client.TiendaClient;
+import com.cibertec.dto.request.TrabajadorCreacionDTO;
 import com.cibertec.dto.response.SuccessResponse;
+import com.cibertec.dto.response.TiendaDTO;
+import com.cibertec.dto.response.TrabajadorDTO;
 import com.cibertec.dto.response.UsuarioDTO;
-import com.cibertec.entity.Tienda;
 import com.cibertec.entity.Trabajador;
-import com.cibertec.entity.Usuario;
-import com.cibertec.repository.ITiendaRepository;
+import com.cibertec.mapper.TrabajadorMapper;
 import com.cibertec.repository.ITrabajadorRepository;
-import com.cibertec.repository.IUsuarioRepository;
 import com.cibertec.service.TrabajadorService;
 import com.cibertec.service.UsuarioService;
 
-import jakarta.persistence.NoResultException;
-
 @Service
 public class TrabajadorServiceImp implements TrabajadorService {
-
     @Autowired
     private ITrabajadorRepository trabajadorRepo;
-    
-    @Autowired
-    private ITiendaRepository tiendaRepo;
-    
     @Autowired
     private UsuarioService usuarioService;
+    @Autowired
+    private TiendaClient tiendaClient;
+    @Autowired
+    private TrabajadorMapper trabajadorMapper;
 
-    /// Registrar
     @Override
-    public Map<String, Object> registrar(TrabajadorDTO trabajador) {
+    @Transactional
+    public Map<String, Object> registrar(TrabajadorCreacionDTO trabajador) {
         Map<String, Object> respuesta = new HashMap<>();
         try {
-        	Tienda tienda = tiendaRepo.findById(trabajador.getIdTienda())
-        			.orElseThrow(() -> new NoResultException("No se encontro la tienda con id: " + trabajador.getIdTienda()));
-        	
+            SuccessResponse<TiendaDTO> tiendaRes = tiendaClient.obtenerTiendaPorId(trabajador.getIdTienda());
+
             SuccessResponse<UsuarioDTO> res = usuarioService.crearUsuario(trabajador.getUsuario());
-            
             Trabajador t = new Trabajador();
-            t.setId(res.getResponse().getId());
-            t.setTienda(tienda);
+            Integer usuarioId = res.getResponse().getId();
+            Integer tiendaId = tiendaRes.getResponse().getId();
+            t.setIdUsuario(usuarioId);
+            t.setIdTienda(tiendaId);
             t.setEnabled(true);
             t.setDelete(false);
             t.setHorasLaborales(trabajador.getHorasLaborales());
             t.setSalario(trabajador.getSalario());
-            
+
             Trabajador guardado = trabajadorRepo.save(t);
+            TrabajadorDTO trabajadorDTO = trabajadorMapper.toDto(guardado);
             
             respuesta.put("mensaje", "Trabajador registrado correctamente");
             respuesta.put("fecha", new Date());
             respuesta.put("status", HttpStatus.CREATED);
-            respuesta.put("trabajador", guardado);
+            respuesta.put("trabajador", trabajadorDTO);
         } catch (Exception e) {
             respuesta.put("mensaje", "Error al registrar trabajador: " + e.getMessage());
             respuesta.put("fecha", new Date());
@@ -70,7 +68,6 @@ public class TrabajadorServiceImp implements TrabajadorService {
     }
 
 
-    /// Eliminación lógica
     @Override
     public Map<String, Object> eliminarLogico(Integer id) {
         Map<String, Object> respuesta = new HashMap<>();
@@ -80,11 +77,12 @@ public class TrabajadorServiceImp implements TrabajadorService {
                 Trabajador t = op.get();
                 t.setEnabled(false);
                 t.setDelete(true);
-                trabajadorRepo.save(t);
+                Trabajador actualizado = trabajadorRepo.save(t);
+                TrabajadorDTO dto = trabajadorMapper.toDto(actualizado);
                 respuesta.put("mensaje", "Trabajador eliminado lógicamente");
                 respuesta.put("fecha", new Date());
                 respuesta.put("status", HttpStatus.OK);
-                respuesta.put("trabajador", t);
+                respuesta.put("trabajador", dto);
             } else {
                 respuesta.put("mensaje", "Trabajador no encontrado");
                 respuesta.put("fecha", new Date());
@@ -98,7 +96,6 @@ public class TrabajadorServiceImp implements TrabajadorService {
         return respuesta;
     }
 
-    /// Listar todos
     @Override
     public Map<String, Object> listarTodos() {
         Map<String, Object> respuesta = new HashMap<>();
@@ -107,7 +104,7 @@ public class TrabajadorServiceImp implements TrabajadorService {
             respuesta.put("mensaje", "Listado de todos los trabajadores");
             respuesta.put("fecha", new Date());
             respuesta.put("status", HttpStatus.OK);
-            respuesta.put("trabajadores", lista);
+            respuesta.put("trabajadores", trabajadorMapper.toDtos(lista));
         } catch (Exception e) {
             respuesta.put("mensaje", "Error al listar trabajadores: " + e.getMessage());
             respuesta.put("fecha", new Date());
@@ -116,7 +113,6 @@ public class TrabajadorServiceImp implements TrabajadorService {
         return respuesta;
     }
 
-    /// Listar activos
     @Override
     public Map<String, Object> listarActivos() {
         Map<String, Object> respuesta = new HashMap<>();
@@ -127,7 +123,7 @@ public class TrabajadorServiceImp implements TrabajadorService {
             respuesta.put("mensaje", "Listado de trabajadores activos");
             respuesta.put("fecha", new Date());
             respuesta.put("status", HttpStatus.OK);
-            respuesta.put("trabajadores", lista);
+            respuesta.put("trabajadores", trabajadorMapper.toDtos(lista));
         } catch (Exception e) {
             respuesta.put("mensaje", "Error al listar trabajadores activos: " + e.getMessage());
             respuesta.put("fecha", new Date());
@@ -136,7 +132,6 @@ public class TrabajadorServiceImp implements TrabajadorService {
         return respuesta;
     }
 
-    /// Listar inactivos
     @Override
     public Map<String, Object> listarInactivos() {
         Map<String, Object> respuesta = new HashMap<>();
@@ -147,7 +142,7 @@ public class TrabajadorServiceImp implements TrabajadorService {
             respuesta.put("mensaje", "Listado de trabajadores inactivos");
             respuesta.put("fecha", new Date());
             respuesta.put("status", HttpStatus.OK);
-            respuesta.put("trabajadores", lista);
+            respuesta.put("trabajadores", trabajadorMapper.toDtos(lista));
         } catch (Exception e) {
             respuesta.put("mensaje", "Error al listar trabajadores inactivos: " + e.getMessage());
             respuesta.put("fecha", new Date());
@@ -156,7 +151,6 @@ public class TrabajadorServiceImp implements TrabajadorService {
         return respuesta;
     }
 
-    /// Obtener por ID
     @Override
     public Map<String, Object> obtenerPorId(Integer id) {
         Map<String, Object> respuesta = new HashMap<>();
@@ -166,7 +160,7 @@ public class TrabajadorServiceImp implements TrabajadorService {
                 respuesta.put("mensaje", "Trabajador encontrado");
                 respuesta.put("fecha", new Date());
                 respuesta.put("status", HttpStatus.OK);
-                respuesta.put("trabajador", trabajador.get());
+                respuesta.put("trabajador", trabajadorMapper.toDto(trabajador.get()));
             } else {
                 respuesta.put("mensaje", "Trabajador no encontrado");
                 respuesta.put("fecha", new Date());
