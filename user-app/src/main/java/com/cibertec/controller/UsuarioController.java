@@ -1,8 +1,9 @@
 package com.cibertec.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cibertec.dto.request.UsuarioActualizarDTO;
+import com.cibertec.dto.request.UsuarioActualizarCorreoDTO;
 import com.cibertec.dto.request.UsuarioCreacionDTO;
 import com.cibertec.dto.response.SuccessResponse;
 import com.cibertec.dto.response.UsuarioDTO;
@@ -26,14 +27,18 @@ public class UsuarioController {
 	private UsuarioService usuarioService;
 	
 	@GetMapping
-	public ResponseEntity<SuccessResponse<List<UsuarioDTO>>> listarUsuarios() {
-		SuccessResponse<List<UsuarioDTO>> resp = usuarioService.listarUsuarios();
+	public ResponseEntity<SuccessResponse<Page<UsuarioDTO>>> listarUsuarios(
+    		@PageableDefault(page = 0, size = 10) Pageable pageable
+    ) {
+		SuccessResponse<Page<UsuarioDTO>> resp = usuarioService.listarUsuarios(pageable);
 		return ResponseEntity.status(resp.getStatus()).body(resp);
 	}
 	
 	@GetMapping("/activos")
-	public ResponseEntity<SuccessResponse<List<UsuarioDTO>>> listarUsuariosActivos() {
-		SuccessResponse<List<UsuarioDTO>> resp = usuarioService.listarUsuariosActivos();
+	public ResponseEntity<SuccessResponse<Page<UsuarioDTO>>> listarUsuariosActivos(
+    		@PageableDefault(page = 0, size = 10) Pageable pageable
+    ) {
+		SuccessResponse<Page<UsuarioDTO>> resp = usuarioService.listarUsuariosActivos(pageable);
 		return ResponseEntity.status(resp.getStatus()).body(resp);
 	}
 	
@@ -56,7 +61,7 @@ public class UsuarioController {
 	@PutMapping("/{id}/actualizar-correo")
 	public ResponseEntity<SuccessResponse<UsuarioDTO>> actualizarCorreo(
 			@PathVariable Integer id,
-			@RequestBody UsuarioActualizarDTO usuario
+			@RequestBody UsuarioActualizarCorreoDTO usuario
 	) {
 		SuccessResponse<UsuarioDTO> resp = usuarioService.actualizarCorreo(id, usuario);
 		return ResponseEntity.status(resp.getStatus()).body(resp);
@@ -75,6 +80,12 @@ public class UsuarioController {
 			@PathVariable Integer id
 	) {
 		SuccessResponse<String> resp = usuarioService.eliminarUsuario(id);
+		return ResponseEntity.status(resp.getStatus()).body(resp);
+	}
+    
+    @PostMapping("/{id}/cambiar-estado")
+    public ResponseEntity<SuccessResponse<String>> cambiarEstado(@PathVariable Integer id) {
+    	SuccessResponse<String> resp = usuarioService.cambiarEstado(id);
 		return ResponseEntity.status(resp.getStatus()).body(resp);
 	}
 }

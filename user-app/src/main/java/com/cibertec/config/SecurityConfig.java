@@ -24,7 +24,8 @@ public class SecurityConfig {
             				"/api/usuarios/**",
             				"/api/roles/**",
             				"/api/trabajadores/**"
-            		).hasRole("ADMIN")
+            		).permitAll()
+//            		).hasRole("ADMIN")
             		.requestMatchers("/api/account/**").permitAll()
             		.anyRequest().authenticated()
             )

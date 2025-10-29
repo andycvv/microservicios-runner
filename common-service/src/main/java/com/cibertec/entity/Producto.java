@@ -51,10 +51,6 @@ public class Producto {
     @ManyToOne
     @JoinColumn(name = "id_marca")
     private Marca marca;
-
-    @ManyToOne
-    @JoinColumn(name = "id_tipo_producto")
-    private TipoProducto tipoProducto;
     
     @Column(nullable = false, updatable = false)
     @CreationTimestamp

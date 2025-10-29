@@ -6,12 +6,14 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 
-import com.cibertec.dto.request.UsuarioActualizarDTO;
+import com.cibertec.dto.request.UsuarioActualizarCorreoDTO;
 import com.cibertec.dto.request.UsuarioCreacionDTO;
 import com.cibertec.dto.response.SuccessResponse;
 import com.cibertec.dto.response.UsuarioCreatedEvent;
@@ -25,6 +27,7 @@ import com.cibertec.entity.Distrito;
 import com.cibertec.entity.Pais;
 import com.cibertec.entity.Provincia;
 import com.cibertec.entity.Rol;
+import com.cibertec.entity.Trabajador;
 import com.cibertec.entity.Usuario;
 import com.cibertec.mapper.UsuarioMapper;
 import com.cibertec.client.UbicacionClient;
@@ -54,30 +57,27 @@ public class UsuarioServiceImpl implements UsuarioService {
 	private MessageProducerService messageProducerService;
 
 	@Override
-	public SuccessResponse<List<UsuarioDTO>> listarUsuarios() {
-		List<UsuarioDTO> list = usuarioRepository.findAll().stream()
-				.map(usuarioMapper::toUsuarioDTO)
-				.toList();
+	public SuccessResponse<Page<UsuarioDTO>> listarUsuarios(Pageable pageable) {
+		Page<UsuarioDTO> page = usuarioRepository.findAll(pageable)
+				.map(usuarioMapper::toUsuarioDTO);
 
-		if (list.isEmpty()) {
+		if (page.isEmpty()) {
 			throw new NoResultException("No se encontro ningun usuario");
 		}
 
-		return SuccessResponse.ok(list);
+		return SuccessResponse.ok(page);
 	}
 	
 	@Override
-	public SuccessResponse<List<UsuarioDTO>> listarUsuariosActivos() {
-		List<UsuarioDTO> list = usuarioRepository.findAll().stream()
-				.filter(u -> !u.isDelete() && u.isEnabled())
-				.map(usuarioMapper::toUsuarioDTO)
-				.toList();
+	public SuccessResponse<Page<UsuarioDTO>> listarUsuariosActivos(Pageable pageable) {
+		Page<UsuarioDTO> page = usuarioRepository.findByIsDeleteFalseAndIsEnabledTrue(pageable)
+				.map(usuarioMapper::toUsuarioDTO);
 
-		if (list.isEmpty()) {
+		if (page.isEmpty()) {
 			throw new NoResultException("No se encontro ningun usuario");
 		}
 
-		return SuccessResponse.ok(list);
+		return SuccessResponse.ok(page);
 	}
 
 	@Override
@@ -89,7 +89,6 @@ public class UsuarioServiceImpl implements UsuarioService {
 		Rol rol = rolRepository.findById(dto.getIdRol())
 				.orElseThrow(() -> new NoResultException("No se encontro el rol con id: " + dto.getIdRol()));
 
-		// fetch ubicacion DTOs via Feign client
 		SuccessResponse<PaisDTO> paisResp = ubicacionClient.getPais(dto.getIdPais());
 		PaisDTO paisDto = paisResp != null ? paisResp.getResponse() : null;
 		if (paisDto == null) throw new NoResultException("No se encontro el pais con id: " + dto.getIdPais());
@@ -103,11 +102,21 @@ public class UsuarioServiceImpl implements UsuarioService {
 		DistritoDTO distDto = distResp != null ? distResp.getResponse() : null;
 		if (distDto == null) throw new NoResultException("No se encontro el distrito con id: " + dto.getIdDistrito());
 
-		// map DTOs to minimal entity instances
-		Pais pais = new Pais(); pais.setId(paisDto.getId()); pais.setNombre(paisDto.getNombre());
-		Departamento departamento = new Departamento(); departamento.setId(depDto.getId()); departamento.setNombre(depDto.getNombre());
-		Provincia provincia = new Provincia(); provincia.setId(provDto.getId()); provincia.setNombre(provDto.getNombre());
-		Distrito distrito = new Distrito(); distrito.setId(distDto.getId()); distrito.setNombre(distDto.getNombre());
+		Pais pais = new Pais(); 
+		pais.setId(paisDto.getId()); 
+		pais.setNombre(paisDto.getNombre());
+		
+		Departamento departamento = new Departamento(); 
+		departamento.setId(depDto.getId()); 
+		departamento.setNombre(depDto.getNombre());
+		
+		Provincia provincia = new Provincia(); 
+		provincia.setId(provDto.getId()); 
+		provincia.setNombre(provDto.getNombre());
+		
+		Distrito distrito = new Distrito(); 
+		distrito.setId(distDto.getId()); 
+		distrito.setNombre(distDto.getNombre());
 
 		String nuevaClave = generarClaveRandom(10);
 		dto.setClave(passwordEncoder.encode(nuevaClave));
@@ -144,14 +153,13 @@ public class UsuarioServiceImpl implements UsuarioService {
 	public SuccessResponse<String> eliminarUsuario(Integer id) {
 		Usuario usuario = usuarioRepository.findById(id)
 				.orElseThrow(() -> new NoResultException("No se encontro el usuario con id: " + id));
-		usuario.setEnabled(false);
 		usuario.setDelete(true);
 		usuarioRepository.save(usuario);
 		return SuccessResponse.ok("Usuario eliminado");
 	}
 
 	@Override
-	public SuccessResponse<UsuarioDTO> actualizarCorreo(Integer id, UsuarioActualizarDTO dto) {
+	public SuccessResponse<UsuarioDTO> actualizarCorreo(Integer id, UsuarioActualizarCorreoDTO dto) {
 		usuarioRepository.findById(id)
 				.orElseThrow(() -> new NoResultException("No se encontro el usuario con id: " + id));
 
@@ -200,6 +208,15 @@ public class UsuarioServiceImpl implements UsuarioService {
 			sb.append(chars.charAt(idx));
 		}
 		return sb.toString();
+	}
+
+	@Override
+	public SuccessResponse<String> cambiarEstado(Integer id) {
+		Usuario usuario = usuarioRepository.findById(id)
+				.orElseThrow(() -> new NoResultException("No se encontro el usuario con id: " + id));
+		usuario.setEnabled(!usuario.isEnabled());
+		usuarioRepository.save(usuario);
+		return SuccessResponse.ok("Estado del usuario actualizado exitosamente");
 	}
 
 }

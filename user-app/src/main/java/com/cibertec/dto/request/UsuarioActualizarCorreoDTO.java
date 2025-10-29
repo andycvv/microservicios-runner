@@ -3,7 +3,6 @@ package com.cibertec.dto.request;
 import lombok.Data;
 
 @Data
-public class UsuarioActualizarDTO {
+public class UsuarioActualizarCorreoDTO {
 	private String email;
-	private String clave;
 }
