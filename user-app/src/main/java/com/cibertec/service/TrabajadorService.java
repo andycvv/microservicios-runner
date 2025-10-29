@@ -1,29 +1,21 @@
 package com.cibertec.service;
 
-import java.util.Map;
+import org.springframework.data.domain.Pageable;
 
+import com.cibertec.dto.request.TrabajadorActualizarDTO;
 import com.cibertec.dto.request.TrabajadorCreacionDTO;
+import com.cibertec.dto.response.PaginacionResponse;
+import com.cibertec.dto.response.SuccessResponse;
+import com.cibertec.dto.response.TrabajadorDTO;
 
 
 public interface TrabajadorService {
-
-    /// Registrar
-    Map<String, Object> registrar(TrabajadorCreacionDTO trabajador);
-
-
-    /// Eliminador Lógico
-    Map<String, Object> eliminarLogico(Integer id);
-
-    /// Listados
-    /////// Todos
-    Map<String, Object> listarTodos();
-
-    /////// Activos
-    Map<String, Object> listarActivos();
-
-    /////// Inactivos
-    Map<String, Object> listarInactivos();
-
-    /// Obtener por ID
-    Map<String, Object> obtenerPorId(Integer id);
+    SuccessResponse<PaginacionResponse<TrabajadorDTO>> listarTodos(Pageable pageable);
+    SuccessResponse<PaginacionResponse<TrabajadorDTO>> listarActivos(Pageable pageable);
+    SuccessResponse<PaginacionResponse<TrabajadorDTO>> listarInactivos(Pageable pageable);
+    SuccessResponse<TrabajadorDTO> obtenerPorId(Integer id);
+	SuccessResponse<TrabajadorDTO> registrar(TrabajadorCreacionDTO trabajador);
+	SuccessResponse<TrabajadorDTO> actualizar(Integer id, TrabajadorActualizarDTO trabajador);
+	SuccessResponse<String> eliminarLogico(Integer id);
+	SuccessResponse<String> cambiarEstado(Integer id);
 }
