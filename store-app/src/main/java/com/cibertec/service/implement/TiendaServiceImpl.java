@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.cibertec.dto.response.SuccessResponse;
 import com.cibertec.dto.response.TiendaDTO;
+import com.cibertec.entity.Tienda;
 import com.cibertec.mapper.TiendaMapper;
 import com.cibertec.repository.ITiendaRepository;
 import com.cibertec.service.TiendaService;
@@ -33,6 +34,14 @@ public class TiendaServiceImpl implements TiendaService {
 		}
 
 		return SuccessResponse.ok(list);
+	}
+
+	@Override
+	public SuccessResponse<TiendaDTO> obtenerTiendaPorId(Integer id) {
+		Tienda tienda = tiendaRepository.findById(id)
+				.orElseThrow(() -> new NoResultException("No se encontro la tienda con id: " + id));
+		
+		return SuccessResponse.ok(tiendaMapper.toTiendaDTO(tienda));
 	}
 	
 	

@@ -19,6 +19,7 @@ public class TiendaMapper {
 				.departamento(tienda.getDepartamento().getNombre())
 				.provincia(tienda.getProvincia().getNombre())
 				.distrito(tienda.getDistrito().getNombre())
+				.isEnabled(tienda.getIsEnabled())
 				.build();
 	}
 	
