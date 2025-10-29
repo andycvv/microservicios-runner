@@ -51,20 +51,32 @@ public class Tienda {
 	@Column(name = "mail", nullable = false, length = 100)
 	private String mail;
 	
+	@Column(name = "id_pais", nullable = false)
+	private Integer idPais;
+	
 	@ManyToOne
-	@JoinColumn(name = "id_pais", nullable = false)
+	@JoinColumn(name = "id_pais", insertable = false, updatable = false)
 	private Pais pais;
 	
+	@Column(name = "id_departamento", nullable = false)
+	private Integer idDepartamento;
+	
 	@ManyToOne
-	@JoinColumn(name = "id_departamento", nullable = false)
+	@JoinColumn(name = "id_departamento", insertable = false, updatable = false)
 	private Departamento departamento;
 	
-	@ManyToOne
-	@JoinColumn(name = "id_provincia", nullable = false)
-	private Provincia provincia;
+	@Column(name = "id_provincia", nullable = false)
+	private Integer idProvincia;
 	
 	@ManyToOne
-	@JoinColumn(name = "id_distrito", nullable = false)
+	@JoinColumn(name = "id_provincia", insertable = false, updatable = false)
+	private Provincia provincia;
+	
+	@Column(name = "id_distrito", nullable = false)
+	private Integer idDistrito;
+	
+	@ManyToOne
+	@JoinColumn(name = "id_distrito", insertable = false, updatable = false)
 	private Distrito distrito;
 	
 	@Column(name = "created_at", updatable = false)
@@ -76,8 +88,8 @@ public class Tienda {
     private LocalDateTime updatedAt;
 	
 	@Column(name = "is_deleted", nullable = false)
-	private Boolean isDeleted = false;
+	private boolean isDeleted = false;
 	
 	@Column(name = "is_enabled", nullable = false)
-	private Boolean isEnabled = true;
+	private boolean isEnabled = true;
 }
