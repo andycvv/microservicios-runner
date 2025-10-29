@@ -16,4 +16,5 @@ public class TiendaDTO {
 	private String departamento;
 	private String provincia;
 	private String distrito;
+	private Boolean isEnabled;
 }
