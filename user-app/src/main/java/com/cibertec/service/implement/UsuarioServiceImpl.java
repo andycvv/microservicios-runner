@@ -89,7 +89,6 @@ public class UsuarioServiceImpl implements UsuarioService {
 		Rol rol = rolRepository.findById(dto.getIdRol())
 				.orElseThrow(() -> new NoResultException("No se encontro el rol con id: " + dto.getIdRol()));
 
-		// fetch ubicacion DTOs via Feign client
 		SuccessResponse<PaisDTO> paisResp = ubicacionClient.getPais(dto.getIdPais());
 		PaisDTO paisDto = paisResp != null ? paisResp.getResponse() : null;
 		if (paisDto == null) throw new NoResultException("No se encontro el pais con id: " + dto.getIdPais());
@@ -103,11 +102,21 @@ public class UsuarioServiceImpl implements UsuarioService {
 		DistritoDTO distDto = distResp != null ? distResp.getResponse() : null;
 		if (distDto == null) throw new NoResultException("No se encontro el distrito con id: " + dto.getIdDistrito());
 
-		// map DTOs to minimal entity instances
-		Pais pais = new Pais(); pais.setId(paisDto.getId()); pais.setNombre(paisDto.getNombre());
-		Departamento departamento = new Departamento(); departamento.setId(depDto.getId()); departamento.setNombre(depDto.getNombre());
-		Provincia provincia = new Provincia(); provincia.setId(provDto.getId()); provincia.setNombre(provDto.getNombre());
-		Distrito distrito = new Distrito(); distrito.setId(distDto.getId()); distrito.setNombre(distDto.getNombre());
+		Pais pais = new Pais(); 
+		pais.setId(paisDto.getId()); 
+		pais.setNombre(paisDto.getNombre());
+		
+		Departamento departamento = new Departamento(); 
+		departamento.setId(depDto.getId()); 
+		departamento.setNombre(depDto.getNombre());
+		
+		Provincia provincia = new Provincia(); 
+		provincia.setId(provDto.getId()); 
+		provincia.setNombre(provDto.getNombre());
+		
+		Distrito distrito = new Distrito(); 
+		distrito.setId(distDto.getId()); 
+		distrito.setNombre(distDto.getNombre());
 
 		String nuevaClave = generarClaveRandom(10);
 		dto.setClave(passwordEncoder.encode(nuevaClave));

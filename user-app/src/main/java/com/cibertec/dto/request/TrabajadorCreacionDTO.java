@@ -1,11 +1,9 @@
 package com.cibertec.dto.request;
 
-import com.cibertec.entity.Usuario;
-
 import lombok.Data;
 
 @Data
-public class TrabajadorDTO {
+public class TrabajadorCreacionDTO {
 	
 	private Double salario;
 	

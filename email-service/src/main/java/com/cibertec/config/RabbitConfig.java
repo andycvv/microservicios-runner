@@ -13,7 +13,7 @@ public class RabbitConfig {
     @Value("${app.queue.password-reset.name}")
     private String passwordResetQueueName;
 
-    @Value("${app.queue.boleta-creada.namee}")
+    @Value("${app.queue.boleta-creada.name}")
     private String boletaCreadaQueueName;
     
     @Bean

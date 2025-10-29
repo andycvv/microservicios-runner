@@ -7,10 +7,11 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
@@ -20,30 +21,36 @@ import lombok.Data;
 @Data
 public class Trabajador {
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	private Double salario;
 	private int horasLaborales;
 
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "id_usuario")
-    private Usuario usuario;
-    
-    @ManyToOne
-    @JoinColumn(name = "id_tienda", nullable = false)
-    private Tienda tienda;
-    
-    @Column(nullable = false, updatable = false)
-    @CreationTimestamp
-    private LocalDateTime createdAt;
+	@Column(name = "id_usuario", nullable = false)
+	private Integer idUsuario;
 
-    @Column(updatable = true)
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
+	@OneToOne
+	@JoinColumn(name = "id_usuario", insertable = false, updatable = false)
+	private Usuario usuario;
 
-    @Column(nullable = false)
-    private boolean isDelete = false;
+	@Column(name = "id_tienda", nullable = false)
+	private Integer idTienda;
 
-    @Column(nullable = false)
-    private boolean isEnabled = true;
+	@ManyToOne
+	@JoinColumn(name = "id_tienda", insertable = false, updatable = false)
+	private Tienda tienda;
+
+	@Column(nullable = false, updatable = false)
+	@CreationTimestamp
+	private LocalDateTime createdAt;
+
+	@Column(updatable = true)
+	@UpdateTimestamp
+	private LocalDateTime updatedAt;
+
+	@Column(nullable = false)
+	private boolean isDelete = false;
+
+	@Column(nullable = false)
+	private boolean isEnabled = true;
 }

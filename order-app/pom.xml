@@ -33,6 +33,11 @@
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>com.cibertec</groupId>
+			<artifactId>common-service</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 		<!-- Dependencias de spring boot -->
 		<dependency>
 	      <groupId>org.springframework.cloud</groupId>

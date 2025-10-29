@@ -154,7 +154,7 @@ public class SecurityConfig {
 				.clientAuthenticationMethod(ClientAuthenticationMethod.NONE) // PKCE client, sin secret
 				.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
 				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-				.redirectUri("http://localhost:4200/auth-callback") // la ruta donde Angular recibe el code
+				.redirectUri("http://localhost:4200/auth/auth-callback") // la ruta donde Angular recibe el code
 				.postLogoutRedirectUri("http://localhost:4200/")
 				.scope(OidcScopes.OPENID).scope(OidcScopes.PROFILE)
 				.tokenSettings(TokenSettings.builder().accessTokenTimeToLive(Duration.ofMinutes(15))
