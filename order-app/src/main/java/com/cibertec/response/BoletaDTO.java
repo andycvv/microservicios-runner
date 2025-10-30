@@ -1,12 +1,14 @@
-package com.cibertec.dto.request;
+package com.cibertec.response;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.Data;
 
-@Data 
-public class BoletaCreacionDTO {
+@Data
+public class BoletaDTO {
+	private Integer id;
 	private String direccion;
 	private String tipoTarjeta;
 	private BigDecimal totalDescuento;
@@ -17,8 +19,9 @@ public class BoletaCreacionDTO {
 	private BigDecimal total;
 	private String estado;
 	private String observaciones;
-	private Integer idUsuario;
-	private Integer idTienda;
-	private Integer idTrabajdor;
-	private List<TransaccionCreacionDTO> transacciones;
+	private UsuarioDTO usuario;
+	private TiendaDTO tienda;
+	private TrabajadorDTO trabajador;
+	private LocalDateTime createdAt;
+	private List<TransaccionDTO> transacciones;
 }
