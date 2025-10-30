@@ -123,7 +123,12 @@ public class UsuarioServiceImpl implements UsuarioService {
 		
 		Usuario usuario = usuarioMapper.toUsuario(null, dto, rol, pais, departamento, provincia, distrito);
 		
-		UsuarioDTO usuarioDTO = usuarioMapper.toUsuarioDTO(usuarioRepository.save(usuario));
+		Usuario guardado = usuarioRepository.save(usuario);
+		
+		UsuarioDTO usuarioDTO = usuarioMapper.toUsuarioDTO(guardado);
+		
+		Rol rolEncontrado = rolRepository.findById(dto.getIdRol())
+				.orElseThrow(() -> new NoResultException("No se encontro el rol con id: " + dto.getIdRol()));
 		
 		UsuarioCreatedEvent usuarioEvent = UsuarioCreatedEvent.builder()
 				.nombre(usuarioDTO.getNombre())
@@ -132,7 +137,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 				.nmrDocumento(usuarioDTO.getNmrDocumento())
 				.email(usuarioDTO.getEmail())
 				.telefono(usuarioDTO.getTelefono())
-				.rol(usuarioDTO.getRol())
+				.rol(rolEncontrado.getNombre())
 				.clave(nuevaClave)
 				.build();
 		

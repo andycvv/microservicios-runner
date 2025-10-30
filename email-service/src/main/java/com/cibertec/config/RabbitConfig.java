@@ -12,9 +12,6 @@ public class RabbitConfig {
 
     @Value("${app.queue.password-reset.name}")
     private String passwordResetQueueName;
-
-    @Value("${app.queue.boleta-creada.name}")
-    private String boletaCreadaQueueName;
     
     @Bean
     Queue usuarioCreadoQueue() {
@@ -25,9 +22,4 @@ public class RabbitConfig {
     Queue passwordResetQueue() {
         return new Queue(passwordResetQueueName, true);
     }
-    
-    @Bean
-    Queue boletaCreadaQueue() {
-		return new Queue(boletaCreadaQueueName, true);
-	}
 }
