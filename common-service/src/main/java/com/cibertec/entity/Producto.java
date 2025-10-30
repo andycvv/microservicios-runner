@@ -1,5 +1,6 @@
 package com.cibertec.entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -30,7 +31,7 @@ public class Producto {
 
     private String nombre;
     private String descripcion;
-    private Double precio;
+    private BigDecimal precio;
 
     @ManyToOne
     @JoinColumn(name = "id_categoria")
