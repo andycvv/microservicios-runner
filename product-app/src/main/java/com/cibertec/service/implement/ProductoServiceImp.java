@@ -18,7 +18,12 @@ import com.cibertec.entity.Producto;
 import com.cibertec.entity.Subcategoria;
 import com.cibertec.mapper.PaginacionMapper;
 import com.cibertec.mapper.ProductoMapper;
+import com.cibertec.repository.IBranchRepository;
+import com.cibertec.repository.ICategoriaRepository;
+import com.cibertec.repository.IMarcaRepository;
+import com.cibertec.repository.IMaterialRepository;
 import com.cibertec.repository.IProductoRepository;
+import com.cibertec.repository.ISubcategoriaRepository;
 import com.cibertec.service.ProductoService;
 
 import jakarta.persistence.NoResultException;
@@ -31,12 +36,43 @@ public class ProductoServiceImp implements ProductoService {
     private ProductoMapper productoMapper;
     @Autowired
     private PaginacionMapper paginacionMapper;
+    @Autowired
+    private ICategoriaRepository categoriaRepo;
+    @Autowired
+    private ISubcategoriaRepository subcategoriaRepo;
+    @Autowired
+    private IBranchRepository branchRepo;
+    @Autowired
+    private IMaterialRepository materialRepository;
+    @Autowired
+    private IMarcaRepository marcaRepo;
 
     @Override
     public SuccessResponse<ProductoDTO> registrar(ProductoCreacionDTO dto) {
-        Producto p = productoMapper.toEntityFromCreateDto(dto);
+    	Categoria cate = categoriaRepo.findById(dto.getIdCategoria())
+				.orElseThrow(() -> new NoResultException("No se encontro la categoria con id: " + dto.getIdCategoria()));
+    	Subcategoria subcate = subcategoriaRepo.findById(dto.getIdSubcategoria())
+    							.orElseThrow(() -> new NoResultException("No se encontro la subcategoria con id: " + dto.getIdSubcategoria()));
+    	Branch branch = branchRepo.findById(dto.getIdBranch())
+    							.orElseThrow(() -> new NoResultException("No se encontro el branch con id: "+ dto.getIdBranch()));
+    
+    	Material material = materialRepository.findById(dto.getIdMaterial())
+    							.orElseThrow(() -> new NoResultException("No se encontro el material con id: " + dto.getIdMaterial()));
+    	
+    	Marca marca = marcaRepo.findById(dto.getIdMarca())
+    							.orElseThrow(() -> new NoResultException("No se encontro la marca con id: " + dto.getIdMarca()));
+    	
+        Producto p = productoMapper.toProducto(dto);
         Producto saved = productoRepo.save(p);
-        return SuccessResponse.ok(productoMapper.toDto(saved));
+        
+        ProductoDTO productoDTO = productoMapper.toDto(saved);
+        productoDTO.setCategoria(cate.getNombre());
+        productoDTO.setSubcategoria(subcate.getNombre());
+        productoDTO.setBranch(branch.getNombre());
+        productoDTO.setMaterial(material.getNombre());
+        productoDTO.setMarca(marca.getNombre());
+        
+        return SuccessResponse.ok(productoDTO);
     }
 
     @Override
@@ -80,38 +116,39 @@ public class ProductoServiceImp implements ProductoService {
 
     @Override
     public SuccessResponse<ProductoDTO> actualizar(Integer id, ProductoActualizarDTO dto) {
+    	Categoria cate = categoriaRepo.findById(dto.getIdCategoria())
+				.orElseThrow(() -> new NoResultException("No se encontro la categoria con id: " + dto.getIdCategoria()));
+    	Subcategoria subcate = subcategoriaRepo.findById(dto.getIdSubcategoria())
+    							.orElseThrow(() -> new NoResultException("No se encontro la subcategoria con id: " + dto.getIdSubcategoria()));
+    	Branch branch = branchRepo.findById(dto.getIdBranch())
+    							.orElseThrow(() -> new NoResultException("No se encontro el branch con id: "+ dto.getIdBranch()));
+    
+    	Material material = materialRepository.findById(dto.getIdMaterial())
+    							.orElseThrow(() -> new NoResultException("No se encontro el material con id: " + dto.getIdMaterial()));
+    	
+    	Marca marca = marcaRepo.findById(dto.getIdMarca())
+    							.orElseThrow(() -> new NoResultException("No se encontro la marca con id: " + dto.getIdMarca()));
+    	
         Producto p = productoRepo.findById(id)
         		.orElseThrow(() -> new NoResultException("No se encontro el producto con id: " + id));
+        
         p.setNombre(dto.getNombre());
         p.setDescripcion(dto.getDescripcion());
         p.setPrecio(dto.getPrecio());
-        if (dto.getIdCategoria() != null) {
-            Categoria c = new Categoria();
-            c.setId(dto.getIdCategoria());
-            p.setCategoria(c);
-        }
-        if (dto.getIdSubcategoria() != null) {
-            Subcategoria s = new Subcategoria();
-            s.setId(dto.getIdSubcategoria());
-            p.setSubcategoria(s);
-        }
-        if (dto.getIdBranch() != null) {
-            Branch b = new Branch();
-            b.setId(dto.getIdBranch());
-            p.setBranch(b);
-        }
-        if (dto.getIdMaterial() != null) {
-            Material m = new Material();
-            m.setId(dto.getIdMaterial());
-            p.setMaterial(m);
-        }
-        if (dto.getIdMarca() != null) {
-            Marca ma = new Marca();
-            ma.setId(dto.getIdMarca());
-            p.setMarca(ma);
-        }
-        if (dto.getIsEnabled() != null) p.setEnabled(dto.getIsEnabled());
+        p.setCategoria(cate);
+        p.setSubcategoria(subcate);
+        p.setBranch(branch);
+        p.setMaterial(material);
+        p.setMarca(marca);
+        p.setEnabled(dto.getIsEnabled());
+        
         Producto updated = productoRepo.save(p);
-        return SuccessResponse.ok(productoMapper.toDto(updated));
+        ProductoDTO productoDTO = productoMapper.toDto(updated);
+        productoDTO.setCategoria(cate.getNombre());
+        productoDTO.setSubcategoria(subcate.getNombre());
+        productoDTO.setBranch(branch.getNombre());
+        productoDTO.setMaterial(material.getNombre());
+        productoDTO.setMarca(marca.getNombre());
+        return SuccessResponse.ok(productoDTO);
     }
 }

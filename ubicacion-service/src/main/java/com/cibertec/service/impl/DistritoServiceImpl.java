@@ -4,14 +4,23 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.cibertec.dto.request.DistritoActualizarDTO;
+import com.cibertec.dto.request.DistritoCreacionDTO;
 import com.cibertec.dto.response.DistritoDTO;
+import com.cibertec.dto.response.PaginacionResponse;
+import com.cibertec.dto.response.SuccessResponse;
 import com.cibertec.entity.Distrito;
 import com.cibertec.entity.Provincia;
+import com.cibertec.mapper.PaginacionMapper;
 import com.cibertec.repository.IDistritoRepository;
 import com.cibertec.repository.IProvinciaRepository;
 import com.cibertec.service.DistritoService;
+
+import jakarta.persistence.NoResultException;
 
 @Service
 public class DistritoServiceImpl implements DistritoService {
@@ -22,6 +31,9 @@ public class DistritoServiceImpl implements DistritoService {
     @Autowired
     private IProvinciaRepository provinciaRepository;
 
+    @Autowired
+    private PaginacionMapper paginacionMapper;
+
     private DistritoDTO toDto(Distrito d) {
         if (d == null) return null;
         DistritoDTO dto = new DistritoDTO();
@@ -31,61 +43,66 @@ public class DistritoServiceImpl implements DistritoService {
         return dto;
     }
 
-    private Distrito toEntity(DistritoDTO dto) {
-        if (dto == null) return null;
+    @Override
+    public SuccessResponse<PaginacionResponse<DistritoDTO>> listarTodos(Pageable pageable) {
+        Page<DistritoDTO> page = distritoRepository.findAll(pageable).map(this::toDto);
+        return SuccessResponse.ok(paginacionMapper.toPaginacionResponse(page));
+    }
+
+    @Override
+    public SuccessResponse<PaginacionResponse<DistritoDTO>> listarActivos(Pageable pageable) {
+        Page<DistritoDTO> page = distritoRepository.findByIsEnabledTrueAndIsDeleteFalse(pageable).map(this::toDto);
+        return SuccessResponse.ok(paginacionMapper.toPaginacionResponse(page));
+    }
+
+    @Override
+    public SuccessResponse<DistritoDTO> obtenerPorId(Integer id) {
+        Distrito d = distritoRepository.findById(id).orElseThrow(() -> new NoResultException("No se encontro el distrito con id: " + id));
+        return SuccessResponse.ok(toDto(d));
+    }
+
+    @Override
+    public SuccessResponse<DistritoDTO> registrar(DistritoCreacionDTO dto) {
         Distrito d = new Distrito();
-        d.setId(dto.getId());
         d.setNombre(dto.getNombre());
         if (dto.getProvinciaId() != null) {
             Provincia p = provinciaRepository.findById(dto.getProvinciaId()).orElse(null);
             d.setProvincia(p);
         }
-        return d;
+        d.setEnabled(true);
+        d.setDelete(false);
+        Distrito saved = distritoRepository.save(d);
+        return SuccessResponse.ok(toDto(saved));
     }
 
     @Override
-    public List<DistritoDTO> findAll() {
-        return distritoRepository.findAll().stream().map(this::toDto).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<DistritoDTO> findActivos() {
-        return distritoRepository.findAll().stream()
-                .filter(d -> !d.isDelete() && d.isEnabled())
-                .map(this::toDto)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public DistritoDTO findById(Integer id) {
-        return distritoRepository.findById(id).map(this::toDto).orElse(null);
-    }
-
-    @Override
-    public DistritoDTO create(DistritoDTO dto) {
-        Distrito saved = distritoRepository.save(toEntity(dto));
-        return toDto(saved);
-    }
-
-    @Override
-    public DistritoDTO update(Integer id, DistritoDTO dto) {
-        return distritoRepository.findById(id).map(existing -> {
+    public SuccessResponse<DistritoDTO> actualizar(Integer id, DistritoActualizarDTO dto) {
+        Distrito updated = distritoRepository.findById(id).map(existing -> {
             existing.setNombre(dto.getNombre());
             if (dto.getProvinciaId() != null) {
                 Provincia p = provinciaRepository.findById(dto.getProvinciaId()).orElse(null);
                 existing.setProvincia(p);
             }
-            return toDto(distritoRepository.save(existing));
-        }).orElse(null);
+            if (dto.getIsEnabled() != null) existing.setEnabled(dto.getIsEnabled());
+            return distritoRepository.save(existing);
+        }).orElseThrow(() -> new NoResultException("No se encontro el distrito con id: " + id));
+        return SuccessResponse.ok(toDto(updated));
     }
 
     @Override
-    public void delete(Integer id) {
-        distritoRepository.findById(id).ifPresent(d -> {
-            d.setDelete(true);
-            d.setEnabled(false);
-            distritoRepository.save(d);
-        });
+    public SuccessResponse<String> eliminarLogico(Integer id) {
+        Distrito d = distritoRepository.findById(id).orElseThrow(() -> new NoResultException("No se encontro el distrito con id: " + id));
+        d.setDelete(true);
+        distritoRepository.save(d);
+        return SuccessResponse.ok("Distrito eliminado exitosamente");
+    }
+
+    @Override
+    public SuccessResponse<String> cambiarEstado(Integer id) {
+        Distrito d = distritoRepository.findById(id).orElseThrow(() -> new NoResultException("No se encontro el distrito con id: " + id));
+        d.setEnabled(!d.isEnabled());
+        distritoRepository.save(d);
+        return SuccessResponse.ok("Estado del distrito actualizado exitosamente");
     }
 
     @Override

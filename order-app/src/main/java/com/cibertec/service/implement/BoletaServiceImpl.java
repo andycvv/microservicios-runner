@@ -5,9 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.cibertec.client.ProductoClient;
+import com.cibertec.client.UsuarioClient;
 import com.cibertec.dto.request.BoletaCreacionDTO;
 import com.cibertec.dto.request.TransaccionCreacionDTO;
 import com.cibertec.entity.Boleta;
@@ -18,8 +21,10 @@ import com.cibertec.repository.ITransaccionRepository;
 import com.cibertec.response.BoletaDTO;
 import com.cibertec.response.ProductoDTO;
 import com.cibertec.response.SuccessResponse;
+import com.cibertec.response.UsuarioDTO;
 import com.cibertec.service.BoletaService;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jakarta.persistence.NoResultException;
 import jakarta.transaction.Transactional;
 
@@ -34,6 +39,9 @@ public class BoletaServiceImpl implements BoletaService{
 	
 	@Autowired 
 	private ProductoClient productoClient;
+	
+	@Autowired
+	private UsuarioClient usuarioClient;
 	
 	@Autowired
 	private ITransaccionRepository transaccionRepository;
@@ -88,7 +96,11 @@ public class BoletaServiceImpl implements BoletaService{
 
 	@Override
 	@Transactional
-	public SuccessResponse<BoletaDTO> crearBoleta(BoletaCreacionDTO creacionDTO) {
+	@CircuitBreaker(name = "productoService", fallbackMethod = "crearBoletaFallback")
+	public SuccessResponse<String> crearBoleta(BoletaCreacionDTO creacionDTO) {
+		String email = SecurityContextHolder.getContext().getAuthentication().getName();
+		SuccessResponse<UsuarioDTO> usuarioRes = usuarioClient.obtenerUsuarioPorEmail(email);
+		
 		Boleta boleta = new Boleta();
 		boleta.setDireccion(creacionDTO.getDireccion());
 		boleta.setTipoTarjeta(creacionDTO.getTipoTarjeta());
@@ -102,7 +114,7 @@ public class BoletaServiceImpl implements BoletaService{
 		boleta.setObservaciones(creacionDTO.getObservaciones());
 		boleta.setIdUsuario(creacionDTO.getIdUsuario());
 		boleta.setIdTienda(creacionDTO.getIdTienda());
-		boleta.setIdTrabajador(creacionDTO.getIdTrabajdor());
+		boleta.setIdTrabajador(usuarioRes.getResponse().getId());
 		
 		Boleta boletaGuardada = boletaRepository.save(boleta);
 
@@ -132,7 +144,11 @@ public class BoletaServiceImpl implements BoletaService{
 	    boletaGuardada.setTransacciones(transacciones);
 
 	    BoletaDTO boletaDTO = boletaMapper.toBoletaDTO(boletaGuardada);
-	    return SuccessResponse.ok(boletaDTO);
+	    return SuccessResponse.ok("Boleta creada con exito");
+	}
+	
+	public SuccessResponse<String> crearBoletaFallback(BoletaCreacionDTO creacionDTO, Throwable t) {
+	    return SuccessResponse.ok("La boleta no pudo ser creada debido a un problema interno. Por favor, intente nuevamente más tarde.");
 	}
 
 }

@@ -10,7 +10,7 @@ import com.cibertec.dto.response.DepartamentoDTO;
 import com.cibertec.dto.response.ProvinciaDTO;
 import com.cibertec.dto.response.DistritoDTO;
 
-@FeignClient(name = "ubicacion-service", path = "/api")
+@FeignClient(name = "ubicacion-service", url = "${spring.feign.ubicacion-client.url}")
 public interface UbicacionClient {
 
     @GetMapping("/paises/{id}")

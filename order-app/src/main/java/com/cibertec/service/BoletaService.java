@@ -11,5 +11,5 @@ public interface BoletaService {
 	public SuccessResponse<List<BoletaDTO>> listarBoletasPorTrabajadorId(Integer id);
 	public SuccessResponse<List<BoletaDTO>> listarBoletasPorClienteId(Integer id);
 	public SuccessResponse<BoletaDTO> obtenerBoletaPorId(Integer id);
-	public SuccessResponse<BoletaDTO> crearBoleta(BoletaCreacionDTO creacionDTO);
+	public SuccessResponse<String> crearBoleta(BoletaCreacionDTO creacionDTO);
 }

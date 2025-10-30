@@ -1,19 +1,14 @@
 package com.cibertec.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.web.bind.annotation.*;
 
+import com.cibertec.dto.request.DistritoActualizarDTO;
+import com.cibertec.dto.request.DistritoCreacionDTO;
 import com.cibertec.dto.response.DistritoDTO;
+import com.cibertec.dto.response.PaginacionResponse;
 import com.cibertec.dto.response.SuccessResponse;
 import com.cibertec.service.DistritoService;
 
@@ -25,48 +20,39 @@ public class DistritoController {
     private DistritoService distritoService;
 
     @GetMapping
-    public ResponseEntity<SuccessResponse<List<DistritoDTO>>> listAll() {
-        return ResponseEntity.ok(SuccessResponse.ok(distritoService.findAll()));
+    public SuccessResponse<PaginacionResponse<DistritoDTO>> listarTodos(
+            @PageableDefault(page = 0, size = 10) Pageable pageable) {
+        return distritoService.listarTodos(pageable);
     }
 
     @GetMapping("/activos")
-    public ResponseEntity<SuccessResponse<List<DistritoDTO>>> listActivos() {
-        return ResponseEntity.ok(SuccessResponse.ok(distritoService.findActivos()));
+    public SuccessResponse<PaginacionResponse<DistritoDTO>> listarActivos(
+            @PageableDefault(page = 0, size = 10) Pageable pageable) {
+        return distritoService.listarActivos(pageable);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SuccessResponse<DistritoDTO>> getById(@PathVariable Integer id) {
-        DistritoDTO dto = distritoService.findById(id);
-        if (dto == null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(SuccessResponse.ok(dto));
+    public SuccessResponse<DistritoDTO> obtenerPorId(@PathVariable Integer id) {
+        return distritoService.obtenerPorId(id);
     }
 
     @PostMapping
-    public ResponseEntity<SuccessResponse<DistritoDTO>> create(@RequestBody DistritoDTO dto) {
-        DistritoDTO created = distritoService.create(dto);
-        return ResponseEntity.status(201).body(SuccessResponse.created(created));
+    public SuccessResponse<DistritoDTO> registrar(@RequestBody DistritoCreacionDTO dto) {
+        return distritoService.registrar(dto);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SuccessResponse<DistritoDTO>> update(@PathVariable Integer id, @RequestBody DistritoDTO dto) {
-        DistritoDTO updated = distritoService.update(id, dto);
-        if (updated == null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(SuccessResponse.ok(updated));
+    public SuccessResponse<DistritoDTO> actualizar(@PathVariable Integer id, @RequestBody DistritoActualizarDTO dto) {
+        return distritoService.actualizar(id, dto);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Integer id) {
-        distritoService.delete(id);
-        return ResponseEntity.noContent().build();
+    public SuccessResponse<String> eliminarLogico(@PathVariable Integer id) {
+        return distritoService.eliminarLogico(id);
     }
 
-    @GetMapping("/provincia/{provinciaId}")
-    public ResponseEntity<SuccessResponse<List<DistritoDTO>>> listByProvincia(@PathVariable Integer provinciaId) {
-        return ResponseEntity.ok(SuccessResponse.ok(distritoService.findByProvincia(provinciaId)));
-    }
-
-    @GetMapping("/provincia/{provinciaId}/activos")
-    public ResponseEntity<SuccessResponse<List<DistritoDTO>>> listActivosByProvincia(@PathVariable Integer provinciaId) {
-        return ResponseEntity.ok(SuccessResponse.ok(distritoService.findActivosByProvincia(provinciaId)));
+    @PutMapping("/{id}/cambiar-estado")
+    public SuccessResponse<String> cambiarEstado(@PathVariable Integer id) {
+        return distritoService.cambiarEstado(id);
     }
 }

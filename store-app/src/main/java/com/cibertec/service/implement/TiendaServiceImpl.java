@@ -23,13 +23,10 @@ import jakarta.persistence.NoResultException;
 
 @Service
 public class TiendaServiceImpl implements TiendaService {
-
 	@Autowired
     private ITiendaRepository tiendaRepository;
-	
 	@Autowired
     private TiendaMapper tiendaMapper;
-	
 	@Autowired
 	private UbicacionClient ubicacionClient;
 	
@@ -64,8 +61,12 @@ public class TiendaServiceImpl implements TiendaService {
 	public SuccessResponse<TiendaDTO> obtenerTiendaPorId(Integer id) {
 		Tienda tienda = tiendaRepository.findById(id)
 				.orElseThrow(() -> new NoResultException("No se encontro la tienda con id: " + id));
-		
-		return SuccessResponse.ok(tiendaMapper.toTiendaDTO(tienda));
+		TiendaDTO dto = tiendaMapper.toTiendaDTO(tienda);
+		dto.setPais(ubicacionClient.getPais(tienda.getIdPais()).getResponse().getNombre());
+		dto.setDepartamento(ubicacionClient.getDepartamento(tienda.getIdDepartamento()).getResponse().getNombre());
+		dto.setProvincia(ubicacionClient.getProvincia(tienda.getIdProvincia()).getResponse().getNombre());
+		dto.setDistrito(ubicacionClient.getDistrito(tienda.getIdDistrito()).getResponse().getNombre());
+		return SuccessResponse.ok(dto);
 	}
 
 	@Override

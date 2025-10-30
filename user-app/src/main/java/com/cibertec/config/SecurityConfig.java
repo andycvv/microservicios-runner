@@ -2,6 +2,7 @@ package com.cibertec.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -20,14 +21,15 @@ public class SecurityConfig {
         	.cors(Customizer.withDefaults())
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-            		.requestMatchers(
+            		.requestMatchers(HttpMethod.GET, "/api/usuarios/**").permitAll()
+            		.requestMatchers(HttpMethod.GET, "/api/trabajadores/**").permitAll()
+                    .requestMatchers(
             				"/api/usuarios/**",
             				"/api/roles/**",
             				"/api/trabajadores/**"
-            		).permitAll()
-//            		).hasRole("ADMIN")
-            		.requestMatchers("/api/account/**").permitAll()
-            		.anyRequest().authenticated()
+            		).hasRole("ADMIN")
+                    .requestMatchers("/api/account/**").permitAll()
+                    .anyRequest().authenticated()
             )
             .oauth2ResourceServer(oauth2 -> oauth2
             		.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))

@@ -4,14 +4,23 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.cibertec.dto.request.DepartamentoActualizarDTO;
+import com.cibertec.dto.request.DepartamentoCreacionDTO;
 import com.cibertec.dto.response.DepartamentoDTO;
+import com.cibertec.dto.response.PaginacionResponse;
+import com.cibertec.dto.response.SuccessResponse;
 import com.cibertec.entity.Departamento;
 import com.cibertec.entity.Pais;
+import com.cibertec.mapper.PaginacionMapper;
 import com.cibertec.repository.IDepartamentoRepository;
 import com.cibertec.repository.IPaisRepository;
 import com.cibertec.service.DepartamentoService;
+
+import jakarta.persistence.NoResultException;
 
 @Service
 public class DepartamentoServiceImpl implements DepartamentoService {
@@ -22,6 +31,9 @@ public class DepartamentoServiceImpl implements DepartamentoService {
     @Autowired
     private IPaisRepository paisRepository;
 
+    @Autowired
+    private PaginacionMapper paginacionMapper;
+
     private DepartamentoDTO toDto(Departamento d) {
         if (d == null) return null;
         DepartamentoDTO dto = new DepartamentoDTO();
@@ -31,61 +43,66 @@ public class DepartamentoServiceImpl implements DepartamentoService {
         return dto;
     }
 
-    private Departamento toEntity(DepartamentoDTO dto) {
-        if (dto == null) return null;
+    @Override
+    public SuccessResponse<PaginacionResponse<DepartamentoDTO>> listarTodos(Pageable pageable) {
+        Page<DepartamentoDTO> page = departamentoRepository.findAll(pageable).map(this::toDto);
+        return SuccessResponse.ok(paginacionMapper.toPaginacionResponse(page));
+    }
+
+    @Override
+    public SuccessResponse<PaginacionResponse<DepartamentoDTO>> listarActivos(Pageable pageable) {
+        Page<DepartamentoDTO> page = departamentoRepository.findByIsEnabledTrueAndIsDeleteFalse(pageable).map(this::toDto);
+        return SuccessResponse.ok(paginacionMapper.toPaginacionResponse(page));
+    }
+
+    @Override
+    public SuccessResponse<DepartamentoDTO> obtenerPorId(Integer id) {
+        Departamento d = departamentoRepository.findById(id).orElseThrow(() -> new NoResultException("No se encontro el departamento con id: " + id));
+        return SuccessResponse.ok(toDto(d));
+    }
+
+    @Override
+    public SuccessResponse<DepartamentoDTO> registrar(DepartamentoCreacionDTO dto) {
         Departamento d = new Departamento();
-        d.setId(dto.getId());
         d.setNombre(dto.getNombre());
         if (dto.getPaisId() != null) {
             Pais p = paisRepository.findById(dto.getPaisId()).orElse(null);
             d.setPais(p);
         }
-        return d;
+        d.setEnabled(true);
+        d.setDelete(false);
+        Departamento saved = departamentoRepository.save(d);
+        return SuccessResponse.ok(toDto(saved));
     }
 
     @Override
-    public List<DepartamentoDTO> findAll() {
-        return departamentoRepository.findAll().stream().map(this::toDto).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<DepartamentoDTO> findActivos() {
-        return departamentoRepository.findAll().stream()
-                .filter(d -> !d.isDelete() && d.isEnabled())
-                .map(this::toDto)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public DepartamentoDTO findById(Integer id) {
-        return departamentoRepository.findById(id).map(this::toDto).orElse(null);
-    }
-
-    @Override
-    public DepartamentoDTO create(DepartamentoDTO dto) {
-        Departamento saved = departamentoRepository.save(toEntity(dto));
-        return toDto(saved);
-    }
-
-    @Override
-    public DepartamentoDTO update(Integer id, DepartamentoDTO dto) {
-        return departamentoRepository.findById(id).map(existing -> {
+    public SuccessResponse<DepartamentoDTO> actualizar(Integer id, DepartamentoActualizarDTO dto) {
+        Departamento updated = departamentoRepository.findById(id).map(existing -> {
             existing.setNombre(dto.getNombre());
             if (dto.getPaisId() != null) {
                 Pais p = paisRepository.findById(dto.getPaisId()).orElse(null);
                 existing.setPais(p);
             }
-            return toDto(departamentoRepository.save(existing));
-        }).orElse(null);
+            if (dto.getIsEnabled() != null) existing.setEnabled(dto.getIsEnabled());
+            return departamentoRepository.save(existing);
+        }).orElseThrow(() -> new NoResultException("No se encontro el departamento con id: " + id));
+        return SuccessResponse.ok(toDto(updated));
     }
 
     @Override
-    public void delete(Integer id) {
-        departamentoRepository.findById(id).ifPresent(d -> {
-            d.setDelete(true);
-            d.setEnabled(false);
-            departamentoRepository.save(d);
-        });
+    public SuccessResponse<String> eliminarLogico(Integer id) {
+        Departamento d = departamentoRepository.findById(id).orElseThrow(() -> new NoResultException("No se encontro el departamento con id: " + id));
+        d.setDelete(true);
+        departamentoRepository.save(d);
+        return SuccessResponse.ok("Departamento eliminado exitosamente");
+    }
+
+    @Override
+    public SuccessResponse<String> cambiarEstado(Integer id) {
+        Departamento d = departamentoRepository.findById(id).orElseThrow(() -> new NoResultException("No se encontro el departamento con id: " + id));
+        d.setEnabled(!d.isEnabled());
+        departamentoRepository.save(d);
+        return SuccessResponse.ok("Estado del departamento actualizado exitosamente");
     }
 
     @Override

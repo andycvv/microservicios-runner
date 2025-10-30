@@ -51,7 +51,7 @@ public class CategoriaController {
         return categoriaService.eliminarLogico(id);
     }
 
-    @PostMapping("/{id}/cambiar-estado")
+    @PutMapping("/{id}/cambiar-estado")
     public SuccessResponse<String> cambiarEstado(@PathVariable Integer id) {
         return categoriaService.cambiarEstado(id);
     }

@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -48,8 +49,8 @@ public class BoletaController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<SuccessResponse<BoletaDTO>> crearBoleta(BoletaCreacionDTO creacionDTO) {
-		SuccessResponse<BoletaDTO> resp = boletaService.crearBoleta(creacionDTO);
+	public ResponseEntity<SuccessResponse<String>> crearBoleta(@RequestBody BoletaCreacionDTO creacionDTO) {
+		SuccessResponse<String> resp = boletaService.crearBoleta(creacionDTO);
 		return ResponseEntity.status(resp.getStatus()).body(resp);
 	}
 }

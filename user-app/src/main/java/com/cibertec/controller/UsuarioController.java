@@ -50,6 +50,14 @@ public class UsuarioController {
 		return ResponseEntity.status(resp.getStatus()).body(resp);
 	}
 	
+	@GetMapping("/email/{email}")
+	public ResponseEntity<SuccessResponse<UsuarioDTO>> obtenerUsuarioPorId(
+			@PathVariable String email
+	) {
+		SuccessResponse<UsuarioDTO> resp = usuarioService.obtenerUsuarioPorCorreo(email);
+		return ResponseEntity.status(resp.getStatus()).body(resp);
+	}
+	
 	@PostMapping
 	public ResponseEntity<SuccessResponse<UsuarioDTO>> crearUsuario(
 			@RequestBody UsuarioCreacionDTO usuario
@@ -83,7 +91,7 @@ public class UsuarioController {
 		return ResponseEntity.status(resp.getStatus()).body(resp);
 	}
     
-    @PostMapping("/{id}/cambiar-estado")
+    @PutMapping("/{id}/cambiar-estado")
     public ResponseEntity<SuccessResponse<String>> cambiarEstado(@PathVariable Integer id) {
     	SuccessResponse<String> resp = usuarioService.cambiarEstado(id);
 		return ResponseEntity.status(resp.getStatus()).body(resp);

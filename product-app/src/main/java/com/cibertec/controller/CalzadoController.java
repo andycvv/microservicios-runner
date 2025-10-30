@@ -51,7 +51,7 @@ public class CalzadoController {
         return calzadoService.eliminarLogico(id);
     }
 
-    @PostMapping("/{id}/cambiar-estado")
+    @PutMapping("/{id}/cambiar-estado")
     public SuccessResponse<String> cambiarEstado(@PathVariable Integer id) {
         return calzadoService.cambiarEstado(id);
     }

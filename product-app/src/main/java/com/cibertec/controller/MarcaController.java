@@ -51,7 +51,7 @@ public class MarcaController {
         return marcaService.eliminarLogico(id);
     }
 
-    @PostMapping("/{id}/cambiar-estado")
+    @PutMapping("/{id}/cambiar-estado")
     public SuccessResponse<String> cambiarEstado(@PathVariable Integer id) {
         return marcaService.cambiarEstado(id);
     }

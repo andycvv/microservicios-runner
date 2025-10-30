@@ -29,7 +29,7 @@ public class ProductoMapper {
         return dto;
     }
 
-    public Producto toEntityFromCreateDto(ProductoCreacionDTO dto) {
+    public Producto toProducto(ProductoCreacionDTO dto) {
         Producto p = new Producto();
         p.setNombre(dto.getNombre());
         p.setDescripcion(dto.getDescripcion());
@@ -37,19 +37,29 @@ public class ProductoMapper {
         p.setEnabled(true);
         p.setDelete(false);
         if (dto.getIdCategoria() != null) {
-            Categoria c = new Categoria(); c.setId(dto.getIdCategoria()); p.setCategoria(c);
+            Categoria c = new Categoria(); 
+            c.setId(dto.getIdCategoria()); 
+            p.setCategoria(c);
         }
         if (dto.getIdSubcategoria() != null) {
-            Subcategoria s = new Subcategoria(); s.setId(dto.getIdSubcategoria()); p.setSubcategoria(s);
+            Subcategoria s = new Subcategoria(); 
+            s.setId(dto.getIdSubcategoria()); 
+            p.setSubcategoria(s);
         }
         if (dto.getIdBranch() != null) {
-            Branch b = new Branch(); b.setId(dto.getIdBranch()); p.setBranch(b);
+            Branch b = new Branch(); 
+            b.setId(dto.getIdBranch()); 
+            p.setBranch(b);
         }
         if (dto.getIdMaterial() != null) {
-            Material m = new Material(); m.setId(dto.getIdMaterial()); p.setMaterial(m);
+            Material m = new Material(); 
+            m.setId(dto.getIdMaterial()); 
+            p.setMaterial(m);
         }
         if (dto.getIdMarca() != null) {
-            Marca ma = new Marca(); ma.setId(dto.getIdMarca()); p.setMarca(ma);
+            Marca ma = new Marca(); 
+            ma.setId(dto.getIdMarca()); 
+            p.setMarca(ma);
         }
         return p;
     }

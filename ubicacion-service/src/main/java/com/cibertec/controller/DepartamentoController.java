@@ -1,19 +1,14 @@
 package com.cibertec.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.web.bind.annotation.*;
 
+import com.cibertec.dto.request.DepartamentoActualizarDTO;
+import com.cibertec.dto.request.DepartamentoCreacionDTO;
 import com.cibertec.dto.response.DepartamentoDTO;
+import com.cibertec.dto.response.PaginacionResponse;
 import com.cibertec.dto.response.SuccessResponse;
 import com.cibertec.service.DepartamentoService;
 
@@ -25,49 +20,39 @@ public class DepartamentoController {
     private DepartamentoService departamentoService;
 
     @GetMapping
-    public ResponseEntity<SuccessResponse<List<DepartamentoDTO>>> listAll() {
-        return ResponseEntity.ok(SuccessResponse.ok(departamentoService.findAll()));
+    public SuccessResponse<PaginacionResponse<DepartamentoDTO>> listarTodos(
+            @PageableDefault(page = 0, size = 10) Pageable pageable) {
+        return departamentoService.listarTodos(pageable);
     }
 
     @GetMapping("/activos")
-    public ResponseEntity<SuccessResponse<List<DepartamentoDTO>>> listActivos() {
-        return ResponseEntity.ok(SuccessResponse.ok(departamentoService.findActivos()));
+    public SuccessResponse<PaginacionResponse<DepartamentoDTO>> listarActivos(
+            @PageableDefault(page = 0, size = 10) Pageable pageable) {
+        return departamentoService.listarActivos(pageable);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SuccessResponse<DepartamentoDTO>> getById(@PathVariable Integer id) {
-        DepartamentoDTO dto = departamentoService.findById(id);
-        if (dto == null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(SuccessResponse.ok(dto));
+    public SuccessResponse<DepartamentoDTO> obtenerPorId(@PathVariable Integer id) {
+        return departamentoService.obtenerPorId(id);
     }
 
     @PostMapping
-    public ResponseEntity<SuccessResponse<DepartamentoDTO>> create(@RequestBody DepartamentoDTO dto) {
-        DepartamentoDTO created = departamentoService.create(dto);
-        return ResponseEntity.status(201).body(SuccessResponse.created(created));
+    public SuccessResponse<DepartamentoDTO> registrar(@RequestBody DepartamentoCreacionDTO dto) {
+        return departamentoService.registrar(dto);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SuccessResponse<DepartamentoDTO>> update(@PathVariable Integer id, @RequestBody DepartamentoDTO dto) {
-        DepartamentoDTO updated = departamentoService.update(id, dto);
-        if (updated == null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(SuccessResponse.ok(updated));
+    public SuccessResponse<DepartamentoDTO> actualizar(@PathVariable Integer id, @RequestBody DepartamentoActualizarDTO dto) {
+        return departamentoService.actualizar(id, dto);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Integer id) {
-        departamentoService.delete(id);
-        return ResponseEntity.noContent().build();
+    public SuccessResponse<String> eliminarLogico(@PathVariable Integer id) {
+        return departamentoService.eliminarLogico(id);
     }
 
-    // hierarchical endpoints
-    @GetMapping("/pais/{paisId}")
-    public ResponseEntity<SuccessResponse<List<DepartamentoDTO>>> listByPais(@PathVariable Integer paisId) {
-        return ResponseEntity.ok(SuccessResponse.ok(departamentoService.findByPais(paisId)));
-    }
-
-    @GetMapping("/pais/{paisId}/activos")
-    public ResponseEntity<SuccessResponse<List<DepartamentoDTO>>> listActivosByPais(@PathVariable Integer paisId) {
-        return ResponseEntity.ok(SuccessResponse.ok(departamentoService.findActivosByPais(paisId)));
+    @PutMapping("/{id}/cambiar-estado")
+    public SuccessResponse<String> cambiarEstado(@PathVariable Integer id) {
+        return departamentoService.cambiarEstado(id);
     }
 }

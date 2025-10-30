@@ -13,6 +13,7 @@ public interface UsuarioService {
 	SuccessResponse<Page<UsuarioDTO>> listarUsuariosActivos(Pageable pageable);
 	SuccessResponse<UsuarioDTO> crearUsuario(UsuarioCreacionDTO usuario);
 	SuccessResponse<UsuarioDTO> obtenerUsuarioPorId(Integer id);
+	SuccessResponse<UsuarioDTO> obtenerUsuarioPorCorreo(String email);
 	SuccessResponse<UsuarioDTO> actualizarCorreo(Integer id, UsuarioActualizarCorreoDTO usuario);
 	SuccessResponse<String> actualizarClave(Integer id);
 	SuccessResponse<String> eliminarUsuario(Integer id);

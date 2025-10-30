@@ -51,7 +51,7 @@ public class BranchController {
         return branchService.eliminarLogico(id);
     }
 
-    @PostMapping("/{id}/cambiar-estado")
+    @PutMapping("/{id}/cambiar-estado")
     public SuccessResponse<String> cambiarEstado(@PathVariable Integer id) {
         return branchService.cambiarEstado(id);
     }

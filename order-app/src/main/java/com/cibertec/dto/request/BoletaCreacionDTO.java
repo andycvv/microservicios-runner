@@ -19,6 +19,6 @@ public class BoletaCreacionDTO {
 	private String observaciones;
 	private Integer idUsuario;
 	private Integer idTienda;
-	private Integer idTrabajdor;
+	private Integer idTrabajador;
 	private List<TransaccionCreacionDTO> transacciones;
 }

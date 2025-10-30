@@ -1,14 +1,19 @@
 package com.cibertec.service;
 
-import java.util.List;
+import org.springframework.data.domain.Pageable;
 
+import com.cibertec.dto.request.PaisActualizarDTO;
+import com.cibertec.dto.request.PaisCreacionDTO;
 import com.cibertec.dto.response.PaisDTO;
+import com.cibertec.dto.response.PaginacionResponse;
+import com.cibertec.dto.response.SuccessResponse;
 
 public interface PaisService {
-    List<PaisDTO> findAll();
-    List<PaisDTO> findActivos();
-    PaisDTO findById(Integer id);
-    PaisDTO create(PaisDTO pais);
-    PaisDTO update(Integer id, PaisDTO pais);
-    void delete(Integer id);
+    SuccessResponse<PaginacionResponse<PaisDTO>> listarTodos(Pageable pageable);
+    SuccessResponse<PaginacionResponse<PaisDTO>> listarActivos(Pageable pageable);
+    SuccessResponse<PaisDTO> obtenerPorId(Integer id);
+    SuccessResponse<PaisDTO> registrar(PaisCreacionDTO dto);
+    SuccessResponse<PaisDTO> actualizar(Integer id, PaisActualizarDTO dto);
+    SuccessResponse<String> eliminarLogico(Integer id);
+    SuccessResponse<String> cambiarEstado(Integer id);
 }

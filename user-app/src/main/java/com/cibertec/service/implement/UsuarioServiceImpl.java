@@ -219,4 +219,12 @@ public class UsuarioServiceImpl implements UsuarioService {
 		return SuccessResponse.ok("Estado del usuario actualizado exitosamente");
 	}
 
+	@Override
+	public SuccessResponse<UsuarioDTO> obtenerUsuarioPorCorreo(String email) {
+		Usuario usuario = usuarioRepository.findByEmail(email)
+				.orElseThrow(() -> new NoResultException("No se encontro el usuario con email: " + email));
+
+		return SuccessResponse.ok(usuarioMapper.toUsuarioDTO(usuario));
+	}
+
 }

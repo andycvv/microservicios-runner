@@ -51,7 +51,7 @@ public class ColorController {
         return colorService.eliminarLogico(id);
     }
 
-    @PostMapping("/{id}/cambiar-estado")
+    @PutMapping("/{id}/cambiar-estado")
     public SuccessResponse<String> cambiarEstado(@PathVariable Integer id) {
         return colorService.cambiarEstado(id);
     }
