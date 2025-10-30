@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -55,21 +54,30 @@ public class Boleta {
 	
 	@Column(name = "observaciones", nullable = false, length = 100)
 	private String observaciones;
+
+	@Column(name = "id_usuario", nullable = false)
+	private Integer idUsuario;
 	
 	@ManyToOne
-	@JoinColumn(name = "id_usuario", nullable = false)
+	@JoinColumn(name = "id_usuario", insertable = false, updatable = false)
 	private Usuario usuario;
 	
+	@Column(name = "id_tienda", nullable = false)
+	private Integer idTienda;
+	
 	@ManyToOne
-	@JoinColumn(name = "id_tienda", nullable = false)
+	@JoinColumn(name = "id_tienda", insertable = false, updatable = false)
 	private Tienda tienda;
 
+	@Column(name = "id_trabajador", nullable = false)
+	private Integer idTrabajador;
+	
 	@ManyToOne
-	@JoinColumn(name = "id_trabajador", nullable = false)
+	@JoinColumn(name = "id_trabajador", insertable = false, updatable = false)
 	private Trabajador trabajador;
 	
 	@OneToMany(mappedBy = "boleta")
-	private List<Transaccion> transaccion;
+	private List<Transaccion> transacciones;
 	
 	@Column(name = "created_at", updatable = false)
     @CreationTimestamp
