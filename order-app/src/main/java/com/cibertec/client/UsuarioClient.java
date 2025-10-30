@@ -14,6 +14,6 @@ public interface UsuarioClient {
 	SuccessResponse<UsuarioDTO> obtenerUsuarioPorId(@PathVariable Integer id);
 	@GetMapping("/trabajadores/{id}")
 	SuccessResponse<TrabajadorDTO> obtenerTrabajadorPorId(@PathVariable Integer id);
-	@GetMapping("/email/{email}")
+	@GetMapping("/usuarios/email/{email}")
 	SuccessResponse<UsuarioDTO> obtenerUsuarioPorEmail(@PathVariable String email);
 }

@@ -22,7 +22,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
             		.requestMatchers(HttpMethod.GET, "/api/**").permitAll()
-                    .requestMatchers("/api/**").hasRole("ADMIN")
+                    .requestMatchers("/api/**").permitAll()
                     .anyRequest().authenticated()
             )
             .oauth2ResourceServer(oauth2 -> oauth2

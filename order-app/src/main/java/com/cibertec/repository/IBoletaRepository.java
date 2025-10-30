@@ -1,6 +1,8 @@
 package com.cibertec.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.cibertec.entity.Boleta;
 import java.util.List;
@@ -9,4 +11,6 @@ import java.util.List;
 public interface IBoletaRepository extends JpaRepository<Boleta, Integer> {
 	List<Boleta> findByIdTrabajador(Integer idTrabajador);
 	List<Boleta> findByIdUsuario(Integer idUsuario);
+	Page<Boleta> findByIdTrabajador(Integer idTrabajador, Pageable pageable);
+	Page<Boleta> findByIdUsuario(Integer idUsuario, Pageable pageable);
 }

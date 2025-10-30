@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -13,9 +15,11 @@ import com.cibertec.client.ProductoClient;
 import com.cibertec.client.UsuarioClient;
 import com.cibertec.dto.request.BoletaCreacionDTO;
 import com.cibertec.dto.request.TransaccionCreacionDTO;
+import com.cibertec.dto.response.PaginacionResponse;
 import com.cibertec.entity.Boleta;
 import com.cibertec.entity.Transaccion;
 import com.cibertec.mapper.BoletaMapper;
+import com.cibertec.mapper.PaginacionMapper;
 import com.cibertec.repository.IBoletaRepository;
 import com.cibertec.repository.ITransaccionRepository;
 import com.cibertec.response.BoletaDTO;
@@ -41,48 +45,47 @@ public class BoletaServiceImpl implements BoletaService{
 	private ProductoClient productoClient;
 	
 	@Autowired
+	private PaginacionMapper paginacionMapper;
+	
+	@Autowired
 	private UsuarioClient usuarioClient;
 	
 	@Autowired
 	private ITransaccionRepository transaccionRepository;
 	
 	@Override
-	public SuccessResponse<List<BoletaDTO>> listarBoletas() {
-		List<BoletaDTO> lista = boletaRepository.findAll().stream()
-				.map(boletaMapper::toBoletaDTO)
-				.toList();
-		
-		if (lista.isEmpty()) {
+	public SuccessResponse<PaginacionResponse<BoletaDTO>> listarBoletas(Pageable pageable) {
+		Page<BoletaDTO> boletas = boletaRepository.findAll(pageable)
+				.map(boletaMapper::toBoletaDTO);
+		if (boletas.isEmpty()) {
 			throw new NoResultException("No se encontró ninguna tienda");
 		}
 		
-		return SuccessResponse.ok(lista);
+		return SuccessResponse.ok(paginacionMapper.toPaginacionResponse(boletas));
 	}
 
 	@Override
-	public SuccessResponse<List<BoletaDTO>> listarBoletasPorTrabajadorId(Integer id) {
-		List<BoletaDTO> boletasPorTrabajadorId = boletaRepository.findByIdTrabajador(id).stream()
-				.map(boletaMapper::toBoletaDTO)
-				.toList();
+	public SuccessResponse<PaginacionResponse<BoletaDTO>> listarBoletasPorTrabajadorId(Integer id, Pageable pageable) {
+		Page<BoletaDTO> boletas = boletaRepository.findByIdTrabajador(id, pageable)
+				.map(boletaMapper::toBoletaDTO);
 		
-		if (boletasPorTrabajadorId.isEmpty()) {
+		if (boletas.isEmpty()) {
 			throw new NoResultException("No se encontró ninguna tienda");
 		}
 		
-		return SuccessResponse.ok(boletasPorTrabajadorId);
+		return SuccessResponse.ok(paginacionMapper.toPaginacionResponse(boletas));
 	}
 
 	@Override
-	public SuccessResponse<List<BoletaDTO>> listarBoletasPorClienteId(Integer id) {
-		List<BoletaDTO> boletasPorClienteId = boletaRepository.findByIdUsuario(id).stream()
-				.map(boletaMapper::toBoletaDTO)
-				.toList();
+	public SuccessResponse<PaginacionResponse<BoletaDTO>> listarBoletasPorClienteId(Integer id, Pageable pageable) {
+		Page<BoletaDTO> boletas = boletaRepository.findByIdUsuario(id, pageable)
+				.map(boletaMapper::toBoletaDTO);
 		
-		if (boletasPorClienteId.isEmpty()) {
+		if (boletas.isEmpty()) {
 			throw new NoResultException("No se encontró ninguna tienda");
 		}
 		
-		return SuccessResponse.ok(boletasPorClienteId);
+		return SuccessResponse.ok(paginacionMapper.toPaginacionResponse(boletas));
 	}
 	
 	@Override
