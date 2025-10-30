@@ -20,7 +20,7 @@ public class RolServiceImpl implements RolService {
 		return rolRepository.findAll().stream()
 				.map(rol -> {
 					RolDTO r = new RolDTO();
-					r.setId(r.getId());
+					r.setId(rol.getId());
 					r.setNombre(rol.getNombre());
 					return r;
 				})
@@ -33,7 +33,7 @@ public class RolServiceImpl implements RolService {
 				.filter(rol -> !rol.isDelete() && rol.isEnabled())
 				.map(rol -> {
 					RolDTO r = new RolDTO();
-					r.setId(r.getId());
+					r.setId(rol.getId());
 					r.setNombre(rol.getNombre());
 					return r;
 				})
