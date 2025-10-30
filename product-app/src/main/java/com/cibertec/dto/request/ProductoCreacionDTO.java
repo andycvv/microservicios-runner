@@ -1,5 +1,7 @@
 package com.cibertec.dto.request;
 
+import java.math.BigDecimal;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class ProductoCreacionDTO {
     private String nombre;
     private String descripcion;
-    private Double precio;
+    private BigDecimal precio;
     private Integer idCategoria;
     private Integer idSubcategoria;
     private Integer idBranch;

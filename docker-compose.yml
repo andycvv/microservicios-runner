@@ -1,81 +1,50 @@
 version: '3.8'
 
 services:
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    restart: unless-stopped
-
+  #############################
+  # Servicio de Base de Datos #
+  #############################
   mysql:
     image: mysql:8.0
     container_name: mysql
     environment:
-      MYSQL_ROOT_PASSWORD: rootpass
-      MYSQL_DATABASE: microservicios_db
-      MYSQL_USER: ms_user
-      MYSQL_PASSWORD: ms_pass
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: runner_cibertec_db
     ports:
       - "3306:3306"
     volumes:
+      - mysql-data:/var/lib/mysql
       - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
-    restart: unless-stopped
+    networks:
+      - dawii-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 100s
 
-  eureka-server:
-    build:
-      context: ./eureka-server
-    container_name: eureka-server
+  ######################
+  # Servicios de Colas #
+  ######################
+  rabbit:
+    image: rabbitmq:4-management
+    container_name: rabbitmq
     ports:
-      - "8761:8081"
-    restart: unless-stopped
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 15s
+      retries: 10
+      start_period: 100s
+    networks:
+      - dawii-net
 
-  config-server:
-    build:
-      context: ./config-server
-    container_name: config-server
-    ports:
-      - "8888:8081"
-    depends_on:
-      - eureka-server
-    restart: unless-stopped
-
-  api-gateway:
-    build:
-      context: ./api-gateway
-    container_name: api-gateway
-    ports:
-      - "8080:8081"
-    depends_on:
-      - eureka-server
-      - config-server
-    restart: unless-stopped
-
-  user-app:
-    build:
-      context: ./user-app
-    container_name: user-app
-    ports:
-      - "8082:8081"
-    depends_on:
-      - eureka-server
-      - config-server
-      - mysql
-    restart: unless-stopped
-
-  ubicacion-service:
-    build:
-      context: ./ubicacion-service
-    container_name: ubicacion-service
-    ports:
-      - "8083:8081"
-    depends_on:
-      - eureka-server
-      - config-server
-      - mysql
-    restart: unless-stopped
-
+  #################################
+  # Servicio Consumidores de Cola #
+  #################################
   email-service:
     build:
       context: ./email-service
@@ -85,7 +54,96 @@ services:
     depends_on:
       - eureka-server
       - config-server
-    restart: unless-stopped
+    networks:
+      - dawii-net
+
+  ######################
+  # Servicios de Cloud #
+  ######################
+  config-server:
+    build:
+      context: ./config-server
+    container_name: config-server
+    ports:
+      - "8888:8888"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8888/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - dawii-net
+
+  eureka-server:
+    build:
+      context: ./eureka-server
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 25s
+    networks:
+      - dawii-net
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 25s
+    networks:
+      - dawii-net
+
+  ##################
+  # Microservicios #
+  ##################
+  user-app:
+    build:
+      context: ./user-app
+    container_name: user-app
+    depends_on:
+      api-gateway:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8060/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 25s
+    networks:
+      - dawii-net
+
+  ubicacion-service:
+    build:
+      context: ./ubicacion-service
+    container_name: ubicacion-service
+    depends_on:
+      api-gateway:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    networks:
+      - dawii-net
 
   oauth-server:
     build:
@@ -96,8 +154,13 @@ services:
     depends_on:
       - eureka-server
       - config-server
-    restart: unless-stopped
+    networks:
+      - dawii-net
+
+volumes:
+  mysql-data:
+    driver: local
 
 networks:
-  default:
+  dawii-net:
     driver: bridge
