@@ -15,7 +15,7 @@ import com.cibertec.dto.response.ErrorResponse;
 
 import jakarta.persistence.NoResultException;
 
-@ControllerAdvice
+//@ControllerAdvice
 public class GlobalExceptionHandler {
 
 	@ExceptionHandler({ UsernameNotFoundException.class, BadCredentialsException.class, IllegalArgumentException.class })

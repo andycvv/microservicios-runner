@@ -482,6 +482,10 @@ CREATE TABLE `tb_usuario` (
 
 USE `runner_cibertec_db`;
 
+SET CHARACTER SET 'utf8mb4';
+
+SET NAMES 'utf8mb4';
+
 SET FOREIGN_KEY_CHECKS = 0;
 
 
